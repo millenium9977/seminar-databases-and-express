@@ -10,6 +10,6 @@ export class Network implements EntityBase
     public headquaters: string;
     public name: string;
 
-    public origin_country: Country[];
-    public movie: Movie;
+    public origin_country: Country;
+    public movies: Movie[];
 }

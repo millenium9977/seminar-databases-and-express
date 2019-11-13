@@ -9,7 +9,7 @@ export class Language implements EntityBase
     public name: string;
     public iso_639_1: string;
 
-    public translation: Translation;
+    public translations: Translation[];
 
     public movies: Movie[];
 }

@@ -15,5 +15,5 @@ export class Translation implements EntityBase
     public language: Language;
     public data: Data;
 
-    public movies: Movie[];
+    public movie: Movie;
 }

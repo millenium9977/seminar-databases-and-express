@@ -31,10 +31,10 @@ export class Movie implements EntityBase
     public gerne: Genre;
     public director: Person;
     public data: Data;
+    public productionCompany: Company;
 
     public actors: Person[];
     public reviews: Review[];
-    public productionCompany: Company[];
     public producedIn: Country[];
     public certificatedFor: Country[];
     public translatedLanguages: Language[];
