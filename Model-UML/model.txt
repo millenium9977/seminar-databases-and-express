@@ -47,7 +47,7 @@ class Translation {
   english_name: string
 }
 
-abstract class Data {
+class Data {
   homepage: string
   overview: string
   title: string
@@ -89,7 +89,7 @@ class Person {
 
 Movie "*" -- "1" Genre : have
 Movie "1" -- "*" Translation : has
-Movie ..right|> Data : implements
+Movie "1" -right- "1" Data : has
 Movie "*" -- "*" Language : have
 Movie "1" -- "*" Review : has
 Movie "*" -- "1" Company: have
@@ -98,9 +98,9 @@ Movie "*" -- "*" Country: certificates for
 Movie "*" -- "*" Network: have
 Movie "*" -- "*" Person: are acted
 Movie "*" -- "1" Person: is directed
-Translation "*" -- "1" Language: has
+Translation "*" -- "1" Language: have
 Translation "1" -- "1" Country: has
-Translation ..up|> Data: implements
+Translation "1" -up- "1" Data: has
 Country "1" -- "*" Certification: has
 Country "1" -- "*" Company: has origin
 Country "1" -- "*" Network: has
