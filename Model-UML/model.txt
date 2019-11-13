@@ -1,0 +1,111 @@
+@startuml
+
+class Movie {
+  adult: boolean
+  budget: integer
+  original_language: string
+  original_title: string
+  * id: integer
+  imdb_id: string
+  popularity: string
+  poster_path: string
+  release_date: string
+  revenue: integer
+  runtime: integer
+  vote_average: number
+  vote_count: integer
+  POST rateMovie()
+  DELETE deleteRate()
+}
+
+class Genre {
+  name: string
+  * id: integer
+}
+
+class Company {
+  name: string
+  * id: integer
+  logo_path: string
+  headquarters: string
+  homepage: string
+}
+
+class Country {
+  name: string
+  * iso_3166_1: string
+}
+
+class Language {
+  name: string
+  * iso_639_1: string
+}
+
+class Translation {
+  * id: integer
+  name: string
+  english_name: string
+}
+
+abstract class Data {
+  homepage: string
+  overview: string
+  title: string
+}
+
+class Review {
+  * id: integer
+  content: string
+  POST review()
+}
+
+class Certification {
+  * id: integer
+  certification: string
+  meaning: string
+}
+
+class Network {
+  headquarters: string
+  homepage: string
+  * id: integer
+  name: string
+}
+
+class Person {
+  birthday: string
+  known_for_department: string
+  deathday: string
+  * id: integer
+  name: string
+  gender: integer
+  biography: string
+  popularity: number
+  place_of_birth: string
+  adult: boolean
+  imdb_id: string
+  homepage: string
+}
+
+Movie "*" -- "1" Genre : have
+Movie "1" -- "*" Translation : has
+Movie ..right|> Data : implements
+Movie "*" -- "*" Language : have
+Movie "1" -- "*" Review : has
+Movie "*" -- "1" Company: have
+Movie "*" -- "*" Country: produces in
+Movie "*" -- "*" Country: certificates for
+Movie "*" -- "*" Network: have
+Movie "*" -- "*" Person: are acted
+Movie "*" -- "1" Person: is directed
+Translation "*" -- "1" Language: has
+Translation "1" -- "1" Country: has
+Translation ..up|> Data: implements
+Country "1" -- "*" Certification: has
+Country "1" -- "*" Company: has origin
+Country "1" -- "*" Network: has
+Company "1" -- "*" Company: is parent
+Review "*" -- "1" Person: are authorized
+
+
+@enduml
