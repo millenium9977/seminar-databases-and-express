@@ -36,6 +36,6 @@ module.exports = {
             "error",
             "always"
         ],
-        curly: true,
+        curly: 2,
     }
 };

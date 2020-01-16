@@ -20,13 +20,11 @@ export class CsvLoaderManager {
             delimiter: ',',
             skip_lines_with_error: true,
             skip_empty_lines: true,
-        })
+        });
 
         records.forEach((r) => {
             this._csvObjectFactory.CreateMovieMD(r);
         })
-
-        logger.debug(record);
     }
 
     // private LoadFile(error: NodeJS.ErrnoException | null, data: Buffer): void {

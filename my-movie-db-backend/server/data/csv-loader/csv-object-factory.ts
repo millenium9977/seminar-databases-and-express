@@ -10,6 +10,7 @@ import {GenreManager} from "../../logic/genre-manager";
 import {CompanyManager} from "../../logic/company-manager";
 import {CountryManager} from "../../logic/country-manager";
 import {LanguageManager} from "../../logic/language-manager";
+import {MovieMdManager} from "../../logic/movieMd-manager";
 
 @injectable()
 export class CsvObjectFactory {
@@ -19,15 +20,20 @@ export class CsvObjectFactory {
     private readonly _countryManager: CountryManager;
     private readonly _genreManager: GenreManager;
     private readonly _languageManager: LanguageManager;
+    private readonly _movieMdManager: MovieMdManager;
 
     constructor(collectionManager: CollectionManager,
                 genreManager: GenreManager,
                 companyManager: CompanyManager,
                 countryManager: CountryManager,
-                languageManager: LanguageManager) {
+                languageManager: LanguageManager,
+                movieMdManager: MovieMdManager) {
         this._collectionManager = collectionManager;
         this._genreManager = genreManager;
         this._companyManager = companyManager;
+        this._countryManager = countryManager;
+        this._languageManager = languageManager;
+        this._movieMdManager = movieMdManager;
     }
 
     /**
@@ -81,6 +87,8 @@ export class CsvObjectFactory {
         movieMd.Title = data[20];
         movieMd.Video = data[21];
         movieMd.VoteCount = data[23];
+
+
 
         return movieMd;
     }
