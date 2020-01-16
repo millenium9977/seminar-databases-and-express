@@ -1,6 +1,8 @@
 dist
 .env
 
+*.csv
+
 # dependencies
 /node_modules
 

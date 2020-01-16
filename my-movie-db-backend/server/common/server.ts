@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 
   import installValidator from './openapi';
 
-import l from './logger';
+import logger from './logger';
 
 const app = express();
 
@@ -29,7 +29,7 @@ export default class ExpressServer {
   }
 
   listen(p: string | number = process.env.PORT): Application {
-    const welcome = port => () => l.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname() } on port: ${port}}`);
+    const welcome = port => () => logger.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname() } on port: ${port}}`);
     http.createServer(app).listen(p, welcome(p));
     return app;
   }

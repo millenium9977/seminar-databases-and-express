@@ -14,11 +14,14 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
+    "csv": "^5.3.1",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "express-openapi-validator": "^2.12.1",
     "pino": "^5.13.4",
-    "tmdb-typescript-api": "0.0.5"
+    "reflect-metadata": "^0.1.13",
+    "tmdb-typescript-api": "0.0.5",
+    "tsyringe": "^4.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.3",
@@ -26,6 +29,7 @@
     "@types/mocha": "^5.2.7",
     "@types/pino": "^5.8.10",
     "chai": "^4.2.0",
+    "eslint": "^6.8.0",
     "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
     "pino-pretty": "^3.2.1",
