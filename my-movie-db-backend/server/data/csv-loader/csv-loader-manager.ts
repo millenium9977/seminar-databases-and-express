@@ -22,7 +22,9 @@ export class CsvLoaderManager {
             skip_empty_lines: true,
         })
 
-        const record = records[1];
+        records.forEach((r) => {
+            this._csvObjectFactory.CreateMovieMD(r);
+        })
 
         logger.debug(record);
     }
