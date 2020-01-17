@@ -1,6 +1,8 @@
 import {Language} from "../cross-cutting/data_classes/language";
 import {ILanguageManager} from "./contracts/i-language-manager";
+import {singleton} from "tsyringe";
 
+@singleton()
 export class LanguageManager implements ILanguageManager{
     private _languages: Language[];
 

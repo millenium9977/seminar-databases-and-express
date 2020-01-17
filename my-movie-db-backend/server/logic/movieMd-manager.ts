@@ -20,4 +20,9 @@ export class MovieMdManager implements IMovieMdManager{
         return movie;
     }
 
+    GetMovieByTitle(title: string): MovieMetadata {
+        const movie: MovieMetadata = this._movieMds.find((m) => m.Title === title);
+        return movie;
+    }
+
 }

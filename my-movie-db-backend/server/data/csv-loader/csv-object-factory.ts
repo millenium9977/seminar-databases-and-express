@@ -11,6 +11,7 @@ import {CompanyManager} from "../../logic/company-manager";
 import {CountryManager} from "../../logic/country-manager";
 import {LanguageManager} from "../../logic/language-manager";
 import {MovieMdManager} from "../../logic/movieMd-manager";
+import logger from "../../common/logger";
 
 @injectable()
 export class CsvObjectFactory {
@@ -65,32 +66,46 @@ export class CsvObjectFactory {
      * @param data List with the data to create the MovieMetadata
      * @constructor
      */
-    public CreateMovieMD(data: any[]): MovieMetadata {
+    public CreateMovieMD(data: any[]): void {
         const movieMd = new MovieMetadata();
         movieMd.Adult = data[0];
         movieMd.AvergageVote = data[22] | 0;
         movieMd.Budget = data[2] | 0;
-        movieMd.Collection = this.CreateCollections(data[1], movieMd);
-        movieMd.Genres = this.CreateGernes(data[3]);
+        movieMd.Collection = this.createCollections(data[1], movieMd);
+        movieMd.Genres = this.createGenres(data[3]);
         movieMd.Homepage = data[4];
         movieMd.Id = data[5];
         movieMd.OriginalLanguage = data[7];
         movieMd.OriginalTitle = data[8];
         movieMd.Overview = data[9];
         movieMd.Popularity = data[10] | 0;
-        movieMd.ProductionCountries = this.CreateCounties(data[13]);
-        movieMd.ProductionCompanies = this.CreateCompanies(data[12], movieMd);
+        movieMd.ProductionCountries = this.createCounties(data[13]);
+        movieMd.ProductionCompanies = this.createCompanies(data[12], movieMd);
         movieMd.ReleaseDate = data[14];
-        movieMd.Spoken_Languages = this.CreateLanguages(data[18]);
+        movieMd.Spoken_Languages = this.createLanguages(data[17]);
         movieMd.Status = data[18];
         movieMd.Tagline = data[19];
         movieMd.Title = data[20];
         movieMd.Video = data[21];
         movieMd.VoteCount = data[23];
 
+        this._movieMdManager.SaveMovie(movieMd);
+    }
 
-
-        return movieMd;
+    /**
+     * Faulty stuff i have found:
+     *   1 - The used single quotes
+     *   2 - Some Names Contain single quotes so just replace ' is not possible
+     *   3 - Instead of 'null' the used 'None'.....
+     *   4 - A Company used " inside of their Name -> we have to do this first bc its easier
+     *   5 - \ inside a string are not allowed we just throw them away
+     * @param data A string which is faulty json and from the dataset
+     */
+    private properJsonFormat(data: string): string {
+        let json: string = data.replace(/"/g, '\'');
+        json = json.replace(/\\/g, '');
+        json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
+        return json.replace(/None/g, 'null')
     }
 
     /**
@@ -101,20 +116,22 @@ export class CsvObjectFactory {
      * @param movieMD MovieMetadata to add to the list
      * @constructor
      */
-    private CreateCollections(data: any[], movieMD: MovieMetadata): Collection {
-        if(!data) {
+    private createCollections(data: string, movieMD: MovieMetadata): Collection {
+        if (!data) {
             return null
         }
 
-        let collection: Collection = this._collectionManager.GetCollectionByName(data[1]);
-        if(collection) {
+        const record: any = JSON.parse(this.properJsonFormat(data));
+
+        let collection: Collection = this._collectionManager.GetCollectionByName(record.name);
+        if (collection) {
             collection.Movies.push(movieMD);
             return collection;
         }
 
         collection = {
-            Id: data[0],
-            Name: data[1],
+            Id: record.id,
+            Name: record.name,
             Movies: [movieMD]
         }
 
@@ -128,24 +145,26 @@ export class CsvObjectFactory {
      * @param data An array of Genre Arrays
      * @constructor
      */
-    private CreateGernes(data: any[]): Genre[] {
-        if(!data) {
+    private createGenres(data: string): Genre[] {
+        if (!data) {
             return []
         }
 
-        const genres: Genre[] = [];
-        data.forEach((d) => {
-            let genre: Genre = this._genreManager.GetGenreByName(d[1]);
+        const records: any[] = JSON.parse(this.properJsonFormat(data));
 
-            if(!genre) {
+        const genres: Genre[] = [];
+        records.forEach((r) => {
+            let genre: Genre = this._genreManager.GetGenreByName(r.name);
+
+            if (!genre) {
                 genre = {
-                    Id: data[0],
-                    Name: data[1],
+                    Id: r.id,
+                    Name: r.name,
                 }
             }
 
             genres.push(genre);
-        })
+        });
 
         return genres;
     }
@@ -158,25 +177,34 @@ export class CsvObjectFactory {
      * @param movieMD MovieMD which will be associated with the Companies
      * @constructor
      */
-    private CreateCompanies(data: any[], movieMD: MovieMetadata): Company[] {
-        if(!data) {
+    private createCompanies(data: string, movieMD: MovieMetadata): Company[] {
+
+        if (!data) {
             return []
         }
 
-        const companies: Company[] = [];
-        data.forEach((d) => {
-            let company: Company = this._companyManager.GetCompanyByName(d[0]);
+        let records: any[];
+        try {
+            records = JSON.parse(this.properJsonFormat(data));
+        } catch (e) {
+            logger.error(e);
+            logger.debug(this.properJsonFormat(data));
+        }
 
-            if(!company) {
+        const companies: Company[] = [];
+        records.forEach((r) => {
+            let company: Company = this._companyManager.GetCompanyByName(r.name);
+
+            if (!company) {
                 company = {
-                    Name: d[0],
-                    Id: d[1],
+                    Name: r.name,
+                    Id: r.id,
                     Movies: [movieMD],
                 }
             }
 
             companies.push(company);
-        })
+        });
 
         return companies;
     }
@@ -188,25 +216,27 @@ export class CsvObjectFactory {
      * @param data Array of Country Arrays
      * @constructor
      */
-    private CreateCounties(data: any[]): Country[]{
-        if(!data) {
+    private createCounties(data: string): Country[] {
+        if (!data) {
             return []
         }
 
-        const countries: Country[] = [];
-        data.forEach((d) => {
-            let country: Country = this._countryManager.GetCountryByName(d[1]);
+        const records: any[] = JSON.parse(this.properJsonFormat(data));
 
-            if(!country) {
+        const countries: Country[] = [];
+        records.forEach((r) => {
+            let country: Country = this._countryManager.GetCountryByName(r.name);
+
+            if (!country) {
                 country = {
                     Id: null,
-                    Name: data[1],
-                    Code: data[0],
+                    Name: r.name,
+                    Code: r.iso_3166_1,
                 }
             }
 
             countries.push(country);
-        })
+        });
 
         return countries;
     }
@@ -218,25 +248,33 @@ export class CsvObjectFactory {
      * @param data Array of Language Arrays
      * @constructor
      */
-    private CreateLanguages(data: any[]): Language[]{
-        if(!data) {
+    private createLanguages(data: string): Language[] {
+        if (!data) {
             return []
         }
 
-        const languages: Language[] = [];
-        data.forEach((d) => {
-            let language: Language = this._languageManager.GetLanguageByName(d[1]);
+        let records: any[];
 
-            if(!language) {
+        try {
+            records = JSON.parse(this.properJsonFormat(data));
+        } catch (e) {
+            logger.debug(data);
+        }
+
+        const languages: Language[] = [];
+        records.forEach((r) => {
+            let language: Language = this._languageManager.GetLanguageByName(r.name);
+
+            if (!language) {
                 language = {
                     Id: null,
-                    Name: data[1],
-                    Code: data[0],
+                    Name: r.name,
+                    Code: r.iso_639_1,
                 }
             }
 
             languages.push(language);
-        })
+        });
 
         return languages;
     }
