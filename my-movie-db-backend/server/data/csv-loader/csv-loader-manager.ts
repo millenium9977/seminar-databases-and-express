@@ -5,10 +5,12 @@ import logger from "../../common/logger";
 import {CsvObjectFactory} from "./csv-object-factory";
 import {MovieMdManager} from "../../logic/movieMd-manager";
 import MovieMetadata from "../../cross-cutting/data_classes/movie-metadata";
+import * as path from "path";
 
 @injectable()
 export class CsvLoaderManager {
     private static readonly FILENAME = '/movies_metadata.csv';
+    private static readonly RELATIVE_DIRECTORY_PATH = '../../dataset';
 
     private readonly _csvObjectFactory: CsvObjectFactory;
     private readonly _movieMdManager: MovieMdManager;
@@ -20,7 +22,10 @@ export class CsvLoaderManager {
     }
 
     public LoadCSV() {
-        const content: string = fs.readFileSync(`${process.env.DATASET_FILEPATH}${CsvLoaderManager.FILENAME}`, 'utf8');
+
+        const filepath : string = `${path.join(__dirname, CsvLoaderManager.RELATIVE_DIRECTORY_PATH)}${CsvLoaderManager.FILENAME}`;
+        logger.debug(`Loading csv from: ${filepath}`);
+        const content: string = fs.readFileSync(filepath, 'utf8');
         const records: any[] = parse(content, {
             delimiter: ',',
             skip_lines_with_error: true,
@@ -29,10 +34,7 @@ export class CsvLoaderManager {
 
         records.forEach((r) => {
             this._csvObjectFactory.CreateMovieMD(r);
-        })
-
-        const movie : MovieMetadata = this._movieMdManager.GetMovieByTitle('Toy Story');
-        logger.debug(movie)
+        });
     }
 
     // private LoadFile(error: NodeJS.ErrnoException | null, data: Buffer): void {
