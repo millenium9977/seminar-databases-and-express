@@ -16,25 +16,12 @@ import logger from "../../common/logger";
 @injectable()
 export class CsvObjectFactory {
 
-    private readonly _companyManager: CompanyManager;
-    private readonly _collectionManager: CollectionManager;
-    private readonly _countryManager: CountryManager;
-    private readonly _genreManager: GenreManager;
-    private readonly _languageManager: LanguageManager;
-    private readonly _movieMdManager: MovieMdManager;
-
-    constructor(collectionManager: CollectionManager,
-                genreManager: GenreManager,
-                companyManager: CompanyManager,
-                countryManager: CountryManager,
-                languageManager: LanguageManager,
-                movieMdManager: MovieMdManager) {
-        this._collectionManager = collectionManager;
-        this._genreManager = genreManager;
-        this._companyManager = companyManager;
-        this._countryManager = countryManager;
-        this._languageManager = languageManager;
-        this._movieMdManager = movieMdManager;
+    constructor(private readonly _collectionManager: CollectionManager,
+                private readonly _genreManager: GenreManager,
+                private readonly _companyManager: CompanyManager,
+                private readonly _countryManager: CountryManager,
+                private readonly _languageManager: LanguageManager,
+                private readonly _movieMdManager: MovieMdManager) {
     }
 
     /**
@@ -105,7 +92,7 @@ export class CsvObjectFactory {
         let json: string = data.replace(/"/g, '\'');
         json = json.replace(/\\/g, '');
         json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
-        return json.replace(/None/g, 'null')
+        return json.replace(/None/g, 'null');
     }
 
     /**
@@ -133,7 +120,7 @@ export class CsvObjectFactory {
             Id: record.id,
             Name: record.name,
             Movies: [movieMD]
-        }
+        };
 
         return collection;
     }

@@ -28,7 +28,7 @@ export default class ExpressServer {
     }
 
     router(routes: (app: Application) => void): ExpressServer {
-        installValidator(app, routes)
+        installValidator(app, routes);
         return this;
     }
 
