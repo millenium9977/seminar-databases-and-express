@@ -1,9 +1,9 @@
-import {singleton} from "tsyringe";
-import {IMovieMdManager} from "./contracts/i-movieMd-manager";
-import MovieMetadata from "../cross-cutting/data_classes/movie-metadata";
+import {singleton} from 'tsyringe';
+import {IMovieMdManager} from './contracts/i-movieMd-manager';
+import MovieMetadata from '../cross-cutting/data_classes/movie-metadata';
 
 @singleton()
-export class MovieMdManager implements IMovieMdManager{
+export class MovieMdManager implements IMovieMdManager {
     private _movieMds: MovieMetadata[];
 
     constructor() {
@@ -11,7 +11,7 @@ export class MovieMdManager implements IMovieMdManager{
     }
 
     SaveMovie(movie: MovieMetadata): MovieMetadata {
-        if(!movie) {
+        if (!movie) {
             return null;
         }
 
@@ -21,8 +21,7 @@ export class MovieMdManager implements IMovieMdManager{
     }
 
     GetMovieByTitle(title: string): MovieMetadata {
-        const movie: MovieMetadata = this._movieMds.find((m) => m.Title === title);
-        return movie;
+        return this._movieMds.find((m) => m.Title === title);
     }
 
 }

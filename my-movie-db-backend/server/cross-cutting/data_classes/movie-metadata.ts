@@ -1,8 +1,8 @@
-import Collection from "./collection";
-import Genre from "./genre";
-import {Company} from "./company";
-import {Language} from "./language";
-import {Country} from "./country";
+import Collection from './collection';
+import Genre from './genre';
+import {Company} from './company';
+import {Language} from './language';
+import {Country} from './country';
 
 export default class MovieMetadata {
     public Id: string;
@@ -25,32 +25,32 @@ export default class MovieMetadata {
     public Tagline: string;
     public Title: string;
     public Video: string;
-    public AvergageVote: number;
+    public AverageVote: number;
     public VoteCount: number;
 
     ToString(): String {
-        return "\nId: " + this.Id + "\n" +
-            "Adult: " + this.Adult + "\n" +
-            "Collection: " + this.Collection + "\n" +
-            "Budget: " + this.Budget + "\n" +
-            "Genres: " + JSON.stringify(this.Genres) + "\n" +
-            "Homepage: " + this.Homepage + "\n" +
-            "OriginalLanguage: " + this.OriginalLanguage + "\n" +
-            "OriginalTitle: " + this.OriginalTitle + "\n" +
-            "Overview: " + this.Overview + "\n" +
-            "Popularity: " + this.Popularity + "\n" +
-            "First ProductionCompanies (throws exception because of circular structure): " + this.ProductionCompanies[0].Name + "\n" +
-            "ProductionCountries: " + JSON.stringify(this.ProductionCountries) + "\n" +
-            "ReleaseDate: " + this.ReleaseDate + "\n" +
-            "Revenue: " + this.Revenue + "\n" +
-            "Runtime: " + this.Runtime + "\n" +
-            "Spoken_Language: " + JSON.stringify(this.Spoken_Languages) + "\n" +
-            "Status: " + this.Status + "\n" +
-            "Tagline: " + this.Tagline + "\n" +
-            "Title: " + this.Title + "\n" +
-            "Video: " + this.Video + "\n" +
-            "AverageVote: " + this.AvergageVote + "\n" +
-            "VoteCount: " + this.VoteCount;
+        return '\nId: ' + this.Id + '\n' +
+            'Adult: ' + this.Adult + '\n' +
+            'Collection: ' + this.Collection + '\n' +
+            'Budget: ' + this.Budget + '\n' +
+            'Genres: ' + JSON.stringify(this.Genres) + '\n' +
+            'Homepage: ' + this.Homepage + '\n' +
+            'OriginalLanguage: ' + this.OriginalLanguage + '\n' +
+            'OriginalTitle: ' + this.OriginalTitle + '\n' +
+            'Overview: ' + this.Overview + '\n' +
+            'Popularity: ' + this.Popularity + '\n' +
+            'First ProductionCompanies (throws exception because of circular structure): ' + this.ProductionCompanies[0].Name + '\n' +
+            'ProductionCountries: ' + JSON.stringify(this.ProductionCountries) + '\n' +
+            'ReleaseDate: ' + this.ReleaseDate + '\n' +
+            'Revenue: ' + this.Revenue + '\n' +
+            'Runtime: ' + this.Runtime + '\n' +
+            'Spoken_Language: ' + JSON.stringify(this.Spoken_Languages) + '\n' +
+            'Status: ' + this.Status + '\n' +
+            'Tagline: ' + this.Tagline + '\n' +
+            'Title: ' + this.Title + '\n' +
+            'Video: ' + this.Video + '\n' +
+            'AverageVote: ' + this.AverageVote + '\n' +
+            'VoteCount: ' + this.VoteCount;
     }
 
 }

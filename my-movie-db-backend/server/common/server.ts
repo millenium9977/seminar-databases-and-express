@@ -6,10 +6,10 @@ import http from 'http';
 import os from 'os';
 import cookieParser from 'cookie-parser';
 import installValidator from './openapi';
-import 'reflect-metadata'
+import 'reflect-metadata';
 import logger from './logger';
-import {container} from "tsyringe";
-import {CsvLoaderManager} from "../data/csv-loader/csv-loader-manager";
+import {container} from 'tsyringe';
+import {CsvLoaderManager} from '../data/csv-loader/csv-loader-manager';
 
 const app = express();
 

@@ -41,5 +41,5 @@
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
   },
-  "author": "Carmine DiMascio <cdimascio@gmail.com> (https://github.com/cdimascio)"
+  "author": "Georg Siebert and Keanu Stückrad"
 }
