@@ -1,11 +1,10 @@
 import {singleton} from 'tsyringe';
-import Collection from '../cross-cutting/data_classes/collection';
-import {ICollectionManager} from './contracts/i-collection-manager';
+import {Collection} from '../cross-cutting/data_classes/collection';
 
 
 //TODO: has to be singleton until we have a database running in the background
 @singleton()
-export class CollectionManager implements ICollectionManager {
+export class CollectionManager {
     //TODO: take the pain away asap
     private _collectionList: Collection[];
 

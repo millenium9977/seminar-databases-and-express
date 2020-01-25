@@ -1,10 +1,10 @@
-import Collection from './collection';
-import Genre from './genre';
+import {Collection} from './collection';
+import {Genre} from './genre';
 import {Company} from './company';
 import {Language} from './language';
 import {Country} from './country';
 
-export default class MovieMetadata {
+export class MovieMetadata {
     public Id: string;
     public Adult: boolean;
     public Collection: Collection;

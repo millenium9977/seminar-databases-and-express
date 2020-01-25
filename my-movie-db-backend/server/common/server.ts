@@ -1,19 +1,23 @@
-import express from 'express';
-import {Application} from 'express';
-import path from 'path';
-import bodyParser from 'body-parser';
-import http from 'http';
-import os from 'os';
-import cookieParser from 'cookie-parser';
-import installValidator from './openapi';
+import express            from 'express';
+import {Application}      from 'express';
+import path               from 'path';
+import bodyParser         from 'body-parser';
+import http               from 'http';
+import os                 from 'os';
+import cookieParser       from 'cookie-parser';
+import installValidator   from './openapi';
 import 'reflect-metadata';
-import logger from './logger';
-import {container} from 'tsyringe';
+import logger             from './logger';
+import {container}        from 'tsyringe';
 import {CsvLoaderManager} from '../data/csv-loader/csv-loader-manager';
+import {DatabaseService}  from '../data/database/database-service';
 
 const app = express();
 
 export default class ExpressServer {
+    private readonly _databaseService: DatabaseService;
+    private readonly _csvLoaderManager: CsvLoaderManager;
+
     constructor() {
         const root = path.normalize(__dirname + '/../..');
         app.set('appPath', root + 'client');
@@ -23,16 +27,23 @@ export default class ExpressServer {
         // app.use(cookieParser(process.env.SESSION_SECRET));
         app.use(express.static(`${root}/public`));
 
-        const csvLoaderManager: CsvLoaderManager = container.resolve(CsvLoaderManager);
-        csvLoaderManager.LoadCSV();
+        this._databaseService  = container.resolve(DatabaseService);
+        this._csvLoaderManager = container.resolve(CsvLoaderManager);
+
+        this.setup().catch((error) => logger.error(error));
     }
 
-    router(routes: (app: Application) => void): ExpressServer {
+    private async setup(): Promise<void> {
+        await this._databaseService.Setup();
+        this._csvLoaderManager.LoadCSV();
+    }
+
+    public Router(routes: (app: Application) => void): ExpressServer {
         installValidator(app, routes);
         return this;
     }
 
-    listen(p: string | number = process.env.PORT): Application {
+    public Listen(p: string | number = process.env.PORT): Application {
         const welcome = port => () => logger.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname()} on port: ${port}}`);
         http.createServer(app).listen(p, welcome(p));
         return app;

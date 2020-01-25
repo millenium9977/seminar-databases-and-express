@@ -1,9 +1,8 @@
-import {ICountryManager} from './contracts/i-country-manager';
 import {Country} from '../cross-cutting/data_classes/country';
 import {singleton} from 'tsyringe';
 
 @singleton()
-export class CountryManager implements ICountryManager {
+export class CountryManager {
     private _countries: Country[];
 
     constructor() {

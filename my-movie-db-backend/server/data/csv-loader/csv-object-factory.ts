@@ -1,7 +1,7 @@
 import {injectable} from 'tsyringe';
-import MovieMetadata from '../../cross-cutting/data_classes/movie-metadata';
-import Collection from '../../cross-cutting/data_classes/collection';
-import Genre from '../../cross-cutting/data_classes/genre';
+import {MovieMetadata} from '../../cross-cutting/data_classes/movie-metadata';
+import {Collection} from '../../cross-cutting/data_classes/collection';
+import {Genre} from '../../cross-cutting/data_classes/genre';
 import {Company} from '../../cross-cutting/data_classes/company';
 import {Country} from '../../cross-cutting/data_classes/country';
 import {Language} from '../../cross-cutting/data_classes/language';
@@ -53,7 +53,7 @@ export class CsvObjectFactory {
      * @param data List with the data to create the MovieMetadata
      * @constructor
      */
-    public CreateMovieMD(data: any[]): void {
+    public async CreateMovieMD(data: any[]): Promise<void> {
         const movieMd = new MovieMetadata();
         movieMd.Adult = data[0];
         movieMd.AverageVote = data[22] | 0;
@@ -69,7 +69,7 @@ export class CsvObjectFactory {
         movieMd.ProductionCountries = this.createCounties(data[13]);
         movieMd.ProductionCompanies = this.createCompanies(data[12], movieMd);
         movieMd.ReleaseDate = data[14];
-        movieMd.Spoken_Languages = this.createLanguages(data[17]);
+        movieMd.Spoken_Languages = await this.createLanguages(data[17]);
         movieMd.Status = data[18];
         movieMd.Tagline = data[19];
         movieMd.Title = data[20];
@@ -243,7 +243,7 @@ export class CsvObjectFactory {
      * @param data Array of Language Arrays
      * @constructor
      */
-    private createLanguages(data: string): Language[] {
+    private async createLanguages(data: string): Promise<Language[]> {
         if (!data) {
             return [];
         }
@@ -257,8 +257,14 @@ export class CsvObjectFactory {
         }
 
         const languages: Language[] = [];
-        records.forEach((r) => {
-            let language: Language = this._languageManager.GetLanguageByName(r.name);
+        for (const r of records) {
+            if(!r.name || !r.iso_639_1) {
+                continue;
+            }
+
+            let language: Language = await this._languageManager.GetLanguageByName(r.name);
+
+            logger.debug(`${language}`);
 
             if (!language) {
                 language = {
@@ -267,11 +273,11 @@ export class CsvObjectFactory {
                     Code: r.iso_639_1,
                 };
 
-                this._languageManager.SaveLanguage(language);
+                await this._languageManager.SaveLanguage(language);
             }
 
             languages.push(language);
-        });
+        }
 
         return languages;
     }

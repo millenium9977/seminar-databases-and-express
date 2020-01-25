@@ -1,26 +1,37 @@
-import {Language} from '../cross-cutting/data_classes/language';
-import {ILanguageManager} from './contracts/i-language-manager';
-import {singleton} from 'tsyringe';
+import {Language}              from '../cross-cutting/data_classes/language';
+import {singleton}             from 'tsyringe';
+import DBLanguage, {ILanguage} from '../data/schemas/language-schema';
+
 
 @singleton()
-export class LanguageManager implements ILanguageManager {
-    private _languages: Language[];
+export class LanguageManager {
 
-    constructor() {
-        this._languages = [];
+    public async GetLanguageByName(name: string): Promise<Language> {
+        const result: ILanguage = await DBLanguage.findOne({Name: name});
+
+        if(!result) {
+            return null;
+        }
+
+        return {
+            Id: result._id.toString(),
+            Name: result.Name,
+            Code: result.Code,
+        };
     }
 
-
-    public GetLanguageByName(search: string): Language {
-        return this._languages.find((l) => l.Name === search);
-    }
-
-    public SaveLanguage(language: Language): Language {
+    public async SaveLanguage(language: Language): Promise<Language> {
         if (!language) {
             return null;
         }
 
-        this._languages.push(language);
+
+        const dbLanguage: ILanguage = new DBLanguage({
+            Code: language.Code,
+            Name: language.Name,
+        });
+
+        await dbLanguage.save();
 
         return language;
     }

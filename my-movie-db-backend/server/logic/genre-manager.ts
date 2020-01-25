@@ -1,9 +1,8 @@
 import {singleton} from 'tsyringe';
-import Genre from '../cross-cutting/data_classes/genre';
-import {IGenreManager} from './contracts/i-genre-manager';
+import {Genre} from '../cross-cutting/data_classes/genre';
 
 @singleton()
-export class GenreManager implements IGenreManager {
+export class GenreManager {
     private _genres: Genre[];
 
     constructor() {

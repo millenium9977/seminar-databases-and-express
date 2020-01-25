@@ -1,26 +1,33 @@
 import {singleton} from 'tsyringe';
-import {Company} from '../cross-cutting/data_classes/company';
-import {ICompanyManager} from './contracts/i-company-manager';
+import {Company}   from '../cross-cutting/data_classes/company';
+import DBComapany, {ICompany}  from '../data/schemas/company-schema';
 
 @singleton()
-export class CompanyManager implements ICompanyManager {
-    private _companies: Company[];
+export class CompanyManager {
 
-    constructor() {
-        this._companies = [];
+    public async GetCompanyByName(name: string): Promise<Company> {
+        const result : ICompany = await DBComapany.findOne({Name: name});
+
+        if(! result) {
+            return null;
+        }
+
+        return {
+            Id: result._id,
+            Name:
+        };
     }
 
-    public GetCompanyByName(search: string): Company {
-        return this._companies.find((p) => p.Name === search);
-    }
-
-    public SaveCompany(company: Company): Company {
+    public async SaveCompany(company: Company): Promise<Company> {
         if (!company) {
             return null;
         }
 
-        this._companies.push(company);
+        const dbCompany: ICompany = new DBComapany({
+            Name: company.Name,
+        });
 
+        await dbCompany.save();
         return company;
     }
 }

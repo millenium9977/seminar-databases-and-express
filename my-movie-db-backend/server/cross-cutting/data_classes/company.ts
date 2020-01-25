@@ -1,4 +1,4 @@
-import MovieMetadata from "./movie-metadata";
+import {MovieMetadata} from './movie-metadata';
 
 export class Company {
     public Id: string;
