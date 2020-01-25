@@ -1,40 +1,27 @@
-import {injectable} from "tsyringe";
-import MovieMetadata from "../../cross-cutting/data_classes/movie-metadata";
-import Collection from "../../cross-cutting/data_classes/collection";
-import Genre from "../../cross-cutting/data_classes/genre";
-import {Company} from "../../cross-cutting/data_classes/company";
-import {Country} from "../../cross-cutting/data_classes/country";
-import {Language} from "../../cross-cutting/data_classes/language";
-import {CollectionManager} from "../../logic/collection-manager";
-import {GenreManager} from "../../logic/genre-manager";
-import {CompanyManager} from "../../logic/company-manager";
-import {CountryManager} from "../../logic/country-manager";
-import {LanguageManager} from "../../logic/language-manager";
-import {MovieMdManager} from "../../logic/movieMd-manager";
-import logger from "../../common/logger";
+import {injectable} from 'tsyringe';
+import MovieMetadata from '../../cross-cutting/data_classes/movie-metadata';
+import Collection from '../../cross-cutting/data_classes/collection';
+import Genre from '../../cross-cutting/data_classes/genre';
+import {Company} from '../../cross-cutting/data_classes/company';
+import {Country} from '../../cross-cutting/data_classes/country';
+import {Language} from '../../cross-cutting/data_classes/language';
+import {CollectionManager} from '../../logic/collection-manager';
+import {GenreManager} from '../../logic/genre-manager';
+import {CompanyManager} from '../../logic/company-manager';
+import {CountryManager} from '../../logic/country-manager';
+import {LanguageManager} from '../../logic/language-manager';
+import {MovieMdManager} from '../../logic/movieMd-manager';
+import logger from '../../common/logger';
 
 @injectable()
 export class CsvObjectFactory {
 
-    private readonly _companyManager: CompanyManager;
-    private readonly _collectionManager: CollectionManager;
-    private readonly _countryManager: CountryManager;
-    private readonly _genreManager: GenreManager;
-    private readonly _languageManager: LanguageManager;
-    private readonly _movieMdManager: MovieMdManager;
-
-    constructor(collectionManager: CollectionManager,
-                genreManager: GenreManager,
-                companyManager: CompanyManager,
-                countryManager: CountryManager,
-                languageManager: LanguageManager,
-                movieMdManager: MovieMdManager) {
-        this._collectionManager = collectionManager;
-        this._genreManager = genreManager;
-        this._companyManager = companyManager;
-        this._countryManager = countryManager;
-        this._languageManager = languageManager;
-        this._movieMdManager = movieMdManager;
+    constructor(private readonly _collectionManager: CollectionManager,
+                private readonly _genreManager: GenreManager,
+                private readonly _companyManager: CompanyManager,
+                private readonly _countryManager: CountryManager,
+                private readonly _languageManager: LanguageManager,
+                private readonly _movieMdManager: MovieMdManager) {
     }
 
     /**
@@ -69,7 +56,7 @@ export class CsvObjectFactory {
     public CreateMovieMD(data: any[]): void {
         const movieMd = new MovieMetadata();
         movieMd.Adult = data[0];
-        movieMd.AvergageVote = data[22] | 0;
+        movieMd.AverageVote = data[22] | 0;
         movieMd.Budget = data[2] | 0;
         movieMd.Collection = this.createCollections(data[1], movieMd);
         movieMd.Genres = this.createGenres(data[3]);
@@ -105,7 +92,7 @@ export class CsvObjectFactory {
         let json: string = data.replace(/"/g, '\'');
         json = json.replace(/\\/g, '');
         json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
-        return json.replace(/None/g, 'null')
+        return json.replace(/None/g, 'null');
     }
 
     /**
@@ -118,7 +105,7 @@ export class CsvObjectFactory {
      */
     private createCollections(data: string, movieMD: MovieMetadata): Collection {
         if (!data) {
-            return null
+            return null;
         }
 
         const record: any = JSON.parse(this.properJsonFormat(data));
@@ -132,8 +119,10 @@ export class CsvObjectFactory {
         collection = {
             Id: record.id,
             Name: record.name,
-            Movies: [movieMD]
-        }
+            Movies: [movieMD],
+        };
+
+        this._collectionManager.SaveCollection(collection);
 
         return collection;
     }
@@ -147,7 +136,7 @@ export class CsvObjectFactory {
      */
     private createGenres(data: string): Genre[] {
         if (!data) {
-            return []
+            return [];
         }
 
         const records: any[] = JSON.parse(this.properJsonFormat(data));
@@ -160,7 +149,9 @@ export class CsvObjectFactory {
                 genre = {
                     Id: r.id,
                     Name: r.name,
-                }
+                };
+
+                this._genreManager.SaveGenre(genre);
             }
 
             genres.push(genre);
@@ -180,7 +171,7 @@ export class CsvObjectFactory {
     private createCompanies(data: string, movieMD: MovieMetadata): Company[] {
 
         if (!data) {
-            return []
+            return [];
         }
 
         let records: any[];
@@ -200,7 +191,9 @@ export class CsvObjectFactory {
                     Name: r.name,
                     Id: r.id,
                     Movies: [movieMD],
-                }
+                };
+
+                this._companyManager.SaveCompany(company);
             }
 
             companies.push(company);
@@ -218,7 +211,7 @@ export class CsvObjectFactory {
      */
     private createCounties(data: string): Country[] {
         if (!data) {
-            return []
+            return [];
         }
 
         const records: any[] = JSON.parse(this.properJsonFormat(data));
@@ -232,7 +225,9 @@ export class CsvObjectFactory {
                     Id: null,
                     Name: r.name,
                     Code: r.iso_3166_1,
-                }
+                };
+
+                this._countryManager.SaveCountry(country);
             }
 
             countries.push(country);
@@ -250,7 +245,7 @@ export class CsvObjectFactory {
      */
     private createLanguages(data: string): Language[] {
         if (!data) {
-            return []
+            return [];
         }
 
         let records: any[];
@@ -270,7 +265,9 @@ export class CsvObjectFactory {
                     Id: null,
                     Name: r.name,
                     Code: r.iso_639_1,
-                }
+                };
+
+                this._languageManager.SaveLanguage(language);
             }
 
             languages.push(language);

@@ -1,4 +1,4 @@
-import logger from "../common/logger";
+import logger from '../common/logger';
 
 export const AsyncExceptionHandler = (middleware) => {
     return async (req, res, next) => {
@@ -8,5 +8,5 @@ export const AsyncExceptionHandler = (middleware) => {
             logger.error(error);
             next(error);
         }
-    }
-}
+    };
+};

@@ -1,9 +1,9 @@
-import {Language} from "../cross-cutting/data_classes/language";
-import {ILanguageManager} from "./contracts/i-language-manager";
-import {singleton} from "tsyringe";
+import {Language} from '../cross-cutting/data_classes/language';
+import {ILanguageManager} from './contracts/i-language-manager';
+import {singleton} from 'tsyringe';
 
 @singleton()
-export class LanguageManager implements ILanguageManager{
+export class LanguageManager implements ILanguageManager {
     private _languages: Language[];
 
     constructor() {
@@ -12,12 +12,11 @@ export class LanguageManager implements ILanguageManager{
 
 
     public GetLanguageByName(search: string): Language {
-        const language: Language = this._languages.find((l) => l.Name === search);
-        return language;
+        return this._languages.find((l) => l.Name === search);
     }
 
     public SaveLanguage(language: Language): Language {
-        if(!language) {
+        if (!language) {
             return null;
         }
 

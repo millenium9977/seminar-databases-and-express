@@ -1,6 +1,6 @@
-import {ICountryManager} from "./contracts/i-country-manager";
-import {Country} from "../cross-cutting/data_classes/country";
-import {singleton} from "tsyringe";
+import {ICountryManager} from './contracts/i-country-manager';
+import {Country} from '../cross-cutting/data_classes/country';
+import {singleton} from 'tsyringe';
 
 @singleton()
 export class CountryManager implements ICountryManager {
@@ -11,13 +11,12 @@ export class CountryManager implements ICountryManager {
     }
 
     GetCountryByName(search: string): Country {
-        const country: Country = this._countries.find((c) => c.Name === search);
-        return country;
+        return this._countries.find((c) => c.Name === search);
     }
 
     SaveCountry(country: Country): Country {
-        if(!country) {
-            return null
+        if (!country) {
+            return null;
         }
 
         this._countries.push(country);
