@@ -11,7 +11,7 @@ export interface IMovieMetadata extends Document {
     Adult: boolean;
     Collection: ICollection['_id'];
     Budget: number;
-    Genres: IGenre['_id'][];
+    Genres: IGenre[];
     Homepage: string;
     OriginalLanguage: string;
     OriginalTitle: string;
@@ -35,7 +35,7 @@ export const MovieMetadataSchema: Schema = new Schema({
     Adult: Boolean,
     Collection: {type: Schema.Types.ObjectId, ref: CollectionSchemaName, required: false},
     Budget: Number,
-    Genres: GenreSchema,
+    Genres: [{GenreSchema}],
     Homepage: String,
     OriginalLanguage: String,
     OriginalTitle: String,

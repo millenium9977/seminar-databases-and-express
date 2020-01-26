@@ -1,32 +1,31 @@
-import {Language}              from '../cross-cutting/data_classes/language';
 import {singleton}             from 'tsyringe';
-import DBLanguage, {ILanguage} from '../data/schemas/language-schema';
+import Language, {ILanguage} from '../data/schemas/language-schema';
 
 
 @singleton()
 export class LanguageManager {
 
-    public async GetLanguageByName(name: string): Promise<Language> {
-        const result: ILanguage = await DBLanguage.findOne({Name: name});
-
-        if(!result) {
-            return null;
-        }
-
-        return {
-            Id: result._id.toString(),
-            Name: result.Name,
-            Code: result.Code,
-        };
+    public async GetLanguageByName(name: string): Promise<ILanguage> {
+        return Language.findOne({Name: name});
     }
 
-    public async SaveLanguage(language: Language): Promise<Language> {
+    public async CreateLanguage(code: string, name: string): Promise<ILanguage> {
+        const language: ILanguage = new Language({
+            Name: name,
+            Code: code,
+
+        });
+
+        return language.save();
+    }
+
+    public async SaveLanguage(language: ILanguage): Promise<ILanguage> {
         if (!language) {
             return null;
         }
 
 
-        const dbLanguage: ILanguage = new DBLanguage({
+        const dbLanguage: ILanguage = new Language({
             Code: language.Code,
             Name: language.Name,
         });

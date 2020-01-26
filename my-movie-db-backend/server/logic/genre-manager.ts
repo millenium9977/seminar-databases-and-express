@@ -1,25 +1,18 @@
 import {singleton} from 'tsyringe';
-import {Genre} from '../cross-cutting/data_classes/genre';
+import Gerne, {IGenre} from '../data/schemas/genre-schema';
 
 @singleton()
 export class GenreManager {
-    private _genres: Genre[];
 
-    constructor() {
-        this._genres = [];
+    public async GetGenreByName(name: string): Promise<IGenre> {
+        return Gerne.findOne({Name: name});
     }
 
-    public GetGenreByName(search: string): Genre {
-        return this._genres.find((g) => g.Name === search);
-    }
+    public async CreateGenre(name: string): Promise<IGenre> {
+        const genre: IGenre = new Gerne({
+            Name: name,
+        });
 
-    public SaveGenre(genre: Genre): Genre {
-        if (!genre) {
-            return null;
-        }
-
-        this._genres.push(genre);
-
-        return genre;
+        return genre.save();
     }
 }

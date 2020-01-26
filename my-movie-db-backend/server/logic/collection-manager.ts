@@ -1,25 +1,20 @@
 import {singleton} from 'tsyringe';
-import {Collection} from '../cross-cutting/data_classes/collection';
+import Collection, {ICollection} from '../data/schemas/collection-schema';
 
-
-//TODO: has to be singleton until we have a database running in the background
 @singleton()
 export class CollectionManager {
-    //TODO: take the pain away asap
-    private _collectionList: Collection[];
 
-    constructor() {
-        this._collectionList = [];
+
+    public async GetCollectionByName(name: string): Promise<ICollection> {
+        return Collection.findOne({Name: name});
     }
 
-    public GetCollectionByName(search: string): Collection {
-        //TODO: replaced with database operation
-        return this._collectionList.find((c) => c.Name === search);
-    }
+    public async CreateCollection(name: string): Promise<ICollection> {
+        const collection: ICollection = new Collection({
+            Name: name,
+            Movies: [],
+        });
 
-    public SaveCollection(collection: Collection): Collection {
-        //TODO: replace with database operation
-        this._collectionList.push(collection);
-        return collection;
+        return collection.save();
     }
 }

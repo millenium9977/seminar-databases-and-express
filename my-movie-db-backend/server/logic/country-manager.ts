@@ -1,26 +1,19 @@
-import {Country} from '../cross-cutting/data_classes/country';
 import {singleton} from 'tsyringe';
+import Country, {ICountry} from '../data/schemas/country-schema';
 
 @singleton()
 export class CountryManager {
-    private _countries: Country[];
 
-    constructor() {
-        this._countries = [];
+    public async GetCountryByName(name: string): Promise<ICountry> {
+        return Country.findOne({Name: name});
     }
 
-    GetCountryByName(search: string): Country {
-        return this._countries.find((c) => c.Name === search);
+    public async CreateCountry(name: string, code: string): Promise<ICountry> {
+        const country: ICountry = new Country({
+            Code: code,
+            Name: name,
+        });
+
+        return country.save();
     }
-
-    SaveCountry(country: Country): Country {
-        if (!country) {
-            return null;
-        }
-
-        this._countries.push(country);
-
-        return country;
-    }
-
 }

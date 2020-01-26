@@ -10,7 +10,7 @@ export interface ICompany extends Document {
 
 export const CompanySchema: Schema = new Schema({
     Name: {type: String, required: true},
-    Movies: {type: Schema.Types.DocumentArray, ref: MovieMetadataSchemaName, required: true},
+    Movies: {type: Schema.Types.ObjectId, ref: MovieMetadataSchemaName, required: true},
 });
 
 export default mongoose.model<ICompany>(CompanySchemaName, CompanySchema);

@@ -1,10 +1,4 @@
 import {injectable} from 'tsyringe';
-import {MovieMetadata} from '../../cross-cutting/data_classes/movie-metadata';
-import {Collection} from '../../cross-cutting/data_classes/collection';
-import {Genre} from '../../cross-cutting/data_classes/genre';
-import {Company} from '../../cross-cutting/data_classes/company';
-import {Country} from '../../cross-cutting/data_classes/country';
-import {Language} from '../../cross-cutting/data_classes/language';
 import {CollectionManager} from '../../logic/collection-manager';
 import {GenreManager} from '../../logic/genre-manager';
 import {CompanyManager} from '../../logic/company-manager';
@@ -12,16 +6,22 @@ import {CountryManager} from '../../logic/country-manager';
 import {LanguageManager} from '../../logic/language-manager';
 import {MovieMdManager} from '../../logic/movieMd-manager';
 import logger from '../../common/logger';
+import {ILanguage} from '../schemas/language-schema';
+import {ICountry} from '../schemas/country-schema';
+import {ICompany} from '../schemas/company-schema';
+import {IGenre} from '../schemas/genre-schema';
+import {ICollection} from '../schemas/collection-schema';
+import {IMovieMetadata} from '../schemas/movie-metadata-schema';
 
 @injectable()
 export class CsvObjectFactory {
 
     constructor(private readonly _collectionManager: CollectionManager,
-                private readonly _genreManager: GenreManager,
-                private readonly _companyManager: CompanyManager,
-                private readonly _countryManager: CountryManager,
-                private readonly _languageManager: LanguageManager,
-                private readonly _movieMdManager: MovieMdManager) {
+        private readonly _genreManager: GenreManager,
+        private readonly _companyManager: CompanyManager,
+        private readonly _countryManager: CountryManager,
+        private readonly _languageManager: LanguageManager,
+        private readonly _movieMdManager: MovieMdManager) {
     }
 
     /**
@@ -54,29 +54,36 @@ export class CsvObjectFactory {
      * @constructor
      */
     public async CreateMovieMD(data: any[]): Promise<void> {
-        const movieMd = new MovieMetadata();
-        movieMd.Adult = data[0];
-        movieMd.AverageVote = data[22] | 0;
-        movieMd.Budget = data[2] | 0;
-        movieMd.Collection = this.createCollections(data[1], movieMd);
-        movieMd.Genres = this.createGenres(data[3]);
-        movieMd.Homepage = data[4];
-        movieMd.Id = data[5];
-        movieMd.OriginalLanguage = data[7];
-        movieMd.OriginalTitle = data[8];
-        movieMd.Overview = data[9];
-        movieMd.Popularity = data[10] | 0;
-        movieMd.ProductionCountries = this.createCounties(data[13]);
-        movieMd.ProductionCompanies = this.createCompanies(data[12], movieMd);
-        movieMd.ReleaseDate = data[14];
-        movieMd.Spoken_Languages = await this.createLanguages(data[17]);
-        movieMd.Status = data[18];
-        movieMd.Tagline = data[19];
-        movieMd.Title = data[20];
-        movieMd.Video = data[21];
-        movieMd.VoteCount = data[23];
+        const collection: ICollection = await this.createCollections(data[1]);
+        const genres: IGenre[] = await this.createGenres(data[3]);
+        const countries: ICountry[] = await this.createCounties(data[13]);
+        const companies: ICompany[] = await this.createCompanies(data[12]);
+        const languages: ILanguage[] = await this.createLanguages(data[17]);
 
-        this._movieMdManager.SaveMovie(movieMd);
+        let movie: IMovieMetadata = await this._movieMdManager.CreateMovieMetadata(
+            data[0],
+            data[22] | 0,
+            data[2] | 0,
+            data[4],
+            data[7],
+            data[8],
+            data[9],
+            data[10] | 0,
+            data[14],
+            data[15],
+            data[16],
+            data[18],
+            data[19],
+            data[20],
+            data[21],
+            data[23]
+        );
+
+        movie = await this._movieMdManager.AddGenres(movie, genres);
+        movie = await this._movieMdManager.AddCollection(movie, collection);
+        movie = await this._movieMdManager.AddCompanies(movie, companies);
+        movie = await this._movieMdManager.AddCountries(movie, countries);
+        await this._movieMdManager.AddLanguages(movie, languages);
     }
 
     /**
@@ -103,26 +110,18 @@ export class CsvObjectFactory {
      * @param movieMD MovieMetadata to add to the list
      * @constructor
      */
-    private createCollections(data: string, movieMD: MovieMetadata): Collection {
+    private async createCollections(data: string): Promise<ICollection> {
         if (!data) {
             return null;
         }
 
         const record: any = JSON.parse(this.properJsonFormat(data));
 
-        let collection: Collection = this._collectionManager.GetCollectionByName(record.name);
-        if (collection) {
-            collection.Movies.push(movieMD);
-            return collection;
+        let collection: ICollection = await this._collectionManager.GetCollectionByName(record.name);
+
+        if (!collection) {
+            collection = await this._collectionManager.CreateCollection(record.name);
         }
-
-        collection = {
-            Id: record.id,
-            Name: record.name,
-            Movies: [movieMD],
-        };
-
-        this._collectionManager.SaveCollection(collection);
 
         return collection;
     }
@@ -134,28 +133,23 @@ export class CsvObjectFactory {
      * @param data An array of Genre Arrays
      * @constructor
      */
-    private createGenres(data: string): Genre[] {
+    private async createGenres(data: string): Promise<IGenre[]> {
         if (!data) {
             return [];
         }
 
         const records: any[] = JSON.parse(this.properJsonFormat(data));
 
-        const genres: Genre[] = [];
-        records.forEach((r) => {
-            let genre: Genre = this._genreManager.GetGenreByName(r.name);
+        const genres: IGenre[] = [];
+        for (const r of records) {
+            let genre: IGenre = await this._genreManager.GetGenreByName(r.name);
 
             if (!genre) {
-                genre = {
-                    Id: r.id,
-                    Name: r.name,
-                };
-
-                this._genreManager.SaveGenre(genre);
+                genre = await this._genreManager.CreateGenre(r.name);
             }
 
             genres.push(genre);
-        });
+        }
 
         return genres;
     }
@@ -168,36 +162,24 @@ export class CsvObjectFactory {
      * @param movieMD MovieMD which will be associated with the Companies
      * @constructor
      */
-    private createCompanies(data: string, movieMD: MovieMetadata): Company[] {
+    private async createCompanies(data: string): Promise<ICompany[]> {
 
         if (!data) {
             return [];
         }
 
-        let records: any[];
-        try {
-            records = JSON.parse(this.properJsonFormat(data));
-        } catch (e) {
-            logger.error(e);
-            logger.debug(this.properJsonFormat(data));
-        }
+        let records: any[] = JSON.parse(this.properJsonFormat(data));
 
-        const companies: Company[] = [];
-        records.forEach((r) => {
-            let company: Company = this._companyManager.GetCompanyByName(r.name);
+        const companies: ICompany[] = [];
+        for (const r of records) {
+            let company: ICompany = await this._companyManager.GetCompanyByName(r.name);
 
             if (!company) {
-                company = {
-                    Name: r.name,
-                    Id: r.id,
-                    Movies: [movieMD],
-                };
-
-                this._companyManager.SaveCompany(company);
+                company = await this._companyManager.CreateCompany(r.name);
             }
 
             companies.push(company);
-        });
+        }
 
         return companies;
     }
@@ -209,29 +191,23 @@ export class CsvObjectFactory {
      * @param data Array of Country Arrays
      * @constructor
      */
-    private createCounties(data: string): Country[] {
+    private async createCounties(data: string): Promise<ICountry[]> {
         if (!data) {
             return [];
         }
 
         const records: any[] = JSON.parse(this.properJsonFormat(data));
 
-        const countries: Country[] = [];
-        records.forEach((r) => {
-            let country: Country = this._countryManager.GetCountryByName(r.name);
+        const countries: ICountry[] = [];
+        for (const r of records) {
+            let country: ICountry = await this._countryManager.GetCountryByName(r.name);
 
             if (!country) {
-                country = {
-                    Id: null,
-                    Name: r.name,
-                    Code: r.iso_3166_1,
-                };
-
-                this._countryManager.SaveCountry(country);
+                country = await this._countryManager.CreateCountry(r.name, r.iso_3166_1);
             }
 
             countries.push(country);
-        });
+        }
 
         return countries;
     }
@@ -243,7 +219,7 @@ export class CsvObjectFactory {
      * @param data Array of Language Arrays
      * @constructor
      */
-    private async createLanguages(data: string): Promise<Language[]> {
+    private async createLanguages(data: string): Promise<ILanguage[]> {
         if (!data) {
             return [];
         }
@@ -256,24 +232,16 @@ export class CsvObjectFactory {
             logger.debug(data);
         }
 
-        const languages: Language[] = [];
+        const languages: ILanguage[] = [];
         for (const r of records) {
-            if(!r.name || !r.iso_639_1) {
+            if (!r.name || !r.iso_639_1) {
                 continue;
             }
 
-            let language: Language = await this._languageManager.GetLanguageByName(r.name);
-
-            logger.debug(`${language}`);
+            let language: ILanguage = await this._languageManager.GetLanguageByName(r.name);
 
             if (!language) {
-                language = {
-                    Id: null,
-                    Name: r.name,
-                    Code: r.iso_639_1,
-                };
-
-                await this._languageManager.SaveLanguage(language);
+                language = await this._languageManager.CreateLanguage(r.iso_639_1, r.name);
             }
 
             languages.push(language);
