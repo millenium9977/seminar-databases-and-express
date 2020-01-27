@@ -5,6 +5,8 @@ import {ICollection} from '../data/schemas/collection-schema';
 import {ICompany} from '../data/schemas/company-schema';
 import {ICountry} from '../data/schemas/country-schema';
 import {ILanguage} from '../data/schemas/language-schema';
+import mongoose from 'mongoose';
+import logger from '../common/logger';
 
 @injectable()
 export class MovieMdManager {
@@ -27,36 +29,103 @@ export class MovieMdManager {
         video: boolean = false,
         voteCount: number = null,
     ): Promise<IMovieMetadata> {
-        const result = await MovieMetadata.findOne({Title: title});
-        if(result) {
-            return result;
+        try {
+            let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title});
+            if (!movie) {
+                movie = new MovieMetadata({
+                    Adult: adult,
+                    Budget: budget,
+                    Homepage: homepage,
+                    OriginalLanguage: originalLanguage,
+                    OriginalTitle: originalTitle,
+                    Overview: overview,
+                    Popularity: popularity,
+                    ReleaseDate: releaseDate,
+                    Revenue: revenue,
+                    Runtime: runtime,
+                    Status: status,
+                    Tagline: tagline,
+                    Title: title,
+                    Video: video,
+                    AverageVote: averageVote,
+                    VoteCount: voteCount,
+                    ProductionCompanies: [],
+                    ProductionCountries: [],
+                    Spoken_Languages: [],
+                    Genres: [],
+                    Collection: null,
+                });
+
+                await movie.save();
+            }
+            return movie;
+        } catch (e) {
+            logger.error(e);
+            return MovieMetadata.findOne({Title: title});
+        }
+    }
+
+
+    public async CreateOrGetMovieMetadata(
+        adult: boolean = false,
+        averageVote: number = null,
+        budget: number = null,
+        homepage: string = null,
+        originalLanguage: string = null,
+        originalTitle: string = null,
+        overview: string = null,
+        popularity: number = null,
+        releaseDate: string = null,
+        revenue: number = null,
+        runtime: number = null,
+        status: string = null,
+        tagline: string = null,
+        title: string,
+        video: boolean = false,
+        voteCount: number = null,
+    ): Promise<IMovieMetadata> {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+            const opts = {session, new: true};
+            let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title}, opts);
+            if (!movie) {
+                movie = new MovieMetadata({
+                    Adult: adult,
+                    Budget: budget,
+                    Homepage: homepage,
+                    OriginalLanguage: originalLanguage,
+                    OriginalTitle: originalTitle,
+                    Overview: overview,
+                    Popularity: popularity,
+                    ReleaseDate: releaseDate,
+                    Revenue: revenue,
+                    Runtime: runtime,
+                    Status: status,
+                    Tagline: tagline,
+                    Title: title,
+                    Video: video,
+                    AverageVote: averageVote,
+                    VoteCount: voteCount,
+                    ProductionCompanies: [],
+                    ProductionCountries: [],
+                    Spoken_Languages: [],
+                    Genres: [],
+                    Collection: null,
+                });
+
+                await movie.save(opts);
+            }
+            await session.commitTransaction();
+            session.endSession();
+            return movie;
+        } catch (err) {
+            logger.error(err);
+            await session.abortTransaction();
+            session.endSession();
+            throw err;
         }
 
-        const movie = new MovieMetadata({
-            Adult: adult,
-            Budget: budget,
-            Homepage: homepage,
-            OriginalLanguage: originalLanguage,
-            OriginalTitle: originalTitle,
-            Overview: overview,
-            Popularity: popularity,
-            ReleaseDate: releaseDate,
-            Revenue: revenue,
-            Runtime: runtime,
-            Status: status,
-            Tagline: tagline,
-            Title: title,
-            Video: video,
-            AverageVote: averageVote,
-            VoteCount: voteCount,
-            ProductionCompanies: [],
-            ProductionCountries: [],
-            Spoken_Languages: [],
-            Genres: [],
-            Collection: null,
-        });
-
-        return movie.save();
     }
 
     public async GetMovieByTitle(title: string): Promise<IMovieMetadata> {
@@ -71,7 +140,7 @@ export class MovieMdManager {
      * @constructor
      */
     public async AddGenres(movie: IMovieMetadata, genres: IGenre[]): Promise<IMovieMetadata> {
-        for(const genre of genres) {
+        for (const genre of genres) {
             movie.Genres.push(genre);
         }
 
@@ -101,7 +170,7 @@ export class MovieMdManager {
      * @constructor
      */
     public async AddCompanies(movie: IMovieMetadata, companies: ICompany[]): Promise<IMovieMetadata> {
-        for(const company of companies) {
+        for (const company of companies) {
             movie.ProductionCompanies.push(company);
             company.Movies.push(movie);
             await company.save();
@@ -118,7 +187,7 @@ export class MovieMdManager {
      * @constructor
      */
     public async AddCountries(movie: IMovieMetadata, counties: ICountry[]): Promise<IMovieMetadata> {
-        for(const country of counties) {
+        for (const country of counties) {
             movie.ProductionCountries.push(country);
         }
 
@@ -134,7 +203,7 @@ export class MovieMdManager {
      * @constructor
      */
     public async AddLanguages(movie: IMovieMetadata, languages: ILanguage[]): Promise<IMovieMetadata> {
-        for(const language of languages) {
+        for (const language of languages) {
             movie.Spoken_Languages.push(language);
         }
 

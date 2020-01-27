@@ -1,6 +1,7 @@
-import {singleton}             from 'tsyringe';
+import {singleton} from 'tsyringe';
 import Language, {ILanguage} from '../data/schemas/language-schema';
-
+import mongoose from 'mongoose';
+import logger from '../common/logger';
 
 @singleton()
 export class LanguageManager {
@@ -9,35 +10,46 @@ export class LanguageManager {
         return Language.findOne({Name: name});
     }
 
-    public async CreateLanguage(code: string, name: string): Promise<ILanguage> {
-        const result: ILanguage = await this.GetLanguageByName(name);
-        if(result) {
-            return  result;
+    public async CreateLanguage(name: string, code: string): Promise<ILanguage> {
+        try {
+            let language: ILanguage = await Language.findOne({Name: name});
+            if(!language) {
+                language = new Language({
+                    Name: name,
+                    Code: code,
+                });
+                await language.save();
+            }
+
+            return language;
+        } catch (e) {
+            return Language.findOne({Name: name});
         }
 
-        const language: ILanguage = new Language({
-            Name: name,
-            Code: code,
-
-        });
-
-        return language.save();
     }
 
-    public async SaveLanguage(language: ILanguage): Promise<ILanguage> {
-        if (!language) {
-            return null;
+    public async CreateOrGetLanguage(name: string, code: string): Promise<ILanguage> {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+            const opts = {session, new: true};
+            let language: ILanguage = await Language.findOne({Name: name}, opts);
+            if (!language) {
+                language = new Language({
+                    Name: name,
+                    Code: code,
+                });
+                await language.save(opts);
+            }
+            await session.commitTransaction();
+            session.endSession();
+            return language;
+        } catch (err) {
+            logger.error(err);
+            await session.abortTransaction();
+            session.endSession();
+            throw err;
         }
-
-
-        const dbLanguage: ILanguage = new Language({
-            Code: language.Code,
-            Name: language.Name,
-        });
-
-        await dbLanguage.save();
-
-        return language;
     }
 
 }

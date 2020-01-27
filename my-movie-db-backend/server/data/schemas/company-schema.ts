@@ -9,7 +9,7 @@ export interface ICompany extends Document {
 }
 
 export const CompanySchema: Schema = new Schema({
-    Name: {type: String, required: true},
+    Name: {type: String, required: true, unique: true},
     Movies: [{type: Schema.Types.ObjectId, ref: 'MovieMetadata', required: false}],
 });
 

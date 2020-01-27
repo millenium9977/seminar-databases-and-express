@@ -35,7 +35,7 @@ export default class ExpressServer {
 
     private async setup(): Promise<void> {
         await this._databaseService.Setup();
-        this._csvLoaderManager.LoadCSV();
+        await this._csvLoaderManager.LoadCSV();
     }
 
     public Router(routes: (app: Application) => void): ExpressServer {

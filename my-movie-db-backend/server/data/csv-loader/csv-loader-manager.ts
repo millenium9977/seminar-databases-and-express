@@ -14,7 +14,7 @@ export class CsvLoaderManager {
     constructor(private readonly _csvObjectFactory: CsvObjectFactory) {
     }
 
-    public LoadCSV() {
+    public async LoadCSV() {
 
         const filepath: string = `${path.join(__dirname, CsvLoaderManager.RELATIVE_DIRECTORY_PATH)}${CsvLoaderManager.FILENAME}`;
         logger.debug(`Loading csv from: ${filepath}`);
@@ -25,8 +25,9 @@ export class CsvLoaderManager {
             skip_empty_lines: true,
         });
 
-        for (const r of records) {
-            this._csvObjectFactory.CreateMovieMD(r);
+        for (let i = 0; i < 1000; i++){
+            let r = records[i];
+            await this._csvObjectFactory.CreateMovieMD(r);
         }
     }
 }

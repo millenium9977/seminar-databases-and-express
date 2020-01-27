@@ -1,17 +1,16 @@
-import {injectable}              from 'tsyringe';
-import {CollectionManager}       from '../../logic/collection-manager';
-import {GenreManager}            from '../../logic/genre-manager';
-import {CompanyManager}          from '../../logic/company-manager';
-import {CountryManager}          from '../../logic/country-manager';
-import {LanguageManager}         from '../../logic/language-manager';
-import {MovieMdManager}          from '../../logic/movieMd-manager';
-import logger                    from '../../common/logger';
-import {ILanguage}               from '../schemas/language-schema';
-import {ICountry}                from '../schemas/country-schema';
-import {ICompany}                from '../schemas/company-schema';
-import {IGenre}                  from '../schemas/genre-schema';
-import Collection, {ICollection} from '../schemas/collection-schema';
-import {IMovieMetadata}          from '../schemas/movie-metadata-schema';
+import {injectable} from 'tsyringe';
+import {CollectionManager} from '../../logic/collection-manager';
+import {GenreManager} from '../../logic/genre-manager';
+import {CompanyManager} from '../../logic/company-manager';
+import {CountryManager} from '../../logic/country-manager';
+import {LanguageManager} from '../../logic/language-manager';
+import {MovieMdManager} from '../../logic/movieMd-manager';
+import {ILanguage} from '../schemas/language-schema';
+import {ICountry} from '../schemas/country-schema';
+import {ICompany} from '../schemas/company-schema';
+import {IGenre} from '../schemas/genre-schema';
+import {ICollection} from '../schemas/collection-schema';
+import {IMovieMetadata} from '../schemas/movie-metadata-schema';
 
 @injectable()
 export class CsvObjectFactory {
@@ -22,20 +21,8 @@ export class CsvObjectFactory {
         private readonly _countryManager: CountryManager,
         private readonly _languageManager: LanguageManager,
         private readonly _movieMdManager: MovieMdManager) {
-        this._countryList    = [];
-        this._collectionList = [];
-        this._companyList    = [];
-        this._movieList      = [];
-        this._genreList      = [];
-        this._languageList   = [];
     }
 
-    private readonly _movieList: IMovieMetadata[];
-    private readonly _genreList: IGenre[];
-    private readonly _countryList: ICountry[];
-    private readonly _languageList: ILanguage[];
-    private readonly _companyList: ICompany[];
-    private readonly _collectionList: ICollection[];
 
     /**
      * Array Has to be like (but obviously [] starts by zero ;D )
@@ -68,15 +55,15 @@ export class CsvObjectFactory {
      */
     public async CreateMovieMD(data: any[]): Promise<void> {
         const collection: ICollection = await this.createCollections(data[1]);
-        const genres: IGenre[]        = await this.createGenres(data[3]);
-        const countries: ICountry[]   = await this.createCounties(data[13]);
-        const companies: ICompany[]   = await this.createCompanies(data[12]);
-        const languages: ILanguage[]  = await this.createLanguages(data[17]);
+        const genres: IGenre[] = await this.createGenres(data[3]);
+        const countries: ICountry[] = await this.createCounties(data[13]);
+        const companies: ICompany[] = await this.createCompanies(data[12]);
+        const languages: ILanguage[] = await this.createLanguages(data[17]);
 
-        const adult: boolean  = this.parseToBool(data[0]);
-        const video: boolean  = this.parseToBool(data[21]);
-        let revenue: number   = parseInt(data[15]);
-        let runtime: number   = parseInt(data[16]);
+        const adult: boolean = this.parseToBool(data[0]);
+        const video: boolean = this.parseToBool(data[21]);
+        let revenue: number = parseInt(data[15]);
+        let runtime: number = parseInt(data[16]);
         let voteCount: number = parseInt(data[23]);
 
         if (isNaN(runtime)) {
@@ -111,7 +98,9 @@ export class CsvObjectFactory {
         );
 
         movie = await this._movieMdManager.AddGenres(movie, genres);
-        movie = await this._movieMdManager.AddCollection(movie, collection);
+        if (collection) {
+            movie = await this._movieMdManager.AddCollection(movie, collection);
+        }
         movie = await this._movieMdManager.AddCompanies(movie, companies);
         movie = await this._movieMdManager.AddCountries(movie, countries);
         await this._movieMdManager.AddLanguages(movie, languages);
@@ -139,8 +128,8 @@ export class CsvObjectFactory {
      */
     private properJsonFormat(data: string): string {
         let json: string = data.replace(/"/g, '\'');
-        json             = json.replace(/\\/g, '');
-        json             = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
+        json = json.replace(/\\/g, '');
+        json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
         return json.replace(/None/g, 'null');
     }
 
@@ -152,26 +141,14 @@ export class CsvObjectFactory {
      * @param movieMD MovieMetadata to add to the list
      * @constructor
      */
-    private createCollections(data: string): ICollection {
+    private async createCollections(data: string): Promise<ICollection> {
         if (!data) {
             return null;
         }
 
         const record: any = JSON.parse(this.properJsonFormat(data));
-
-        let collection: ICollection = this._collectionList.find((c) => c.Name === record.name);
-        // let collection: ICollection = await this._collectionManager.GetCollectionByName(record.name);
-
-        if (!collection) {
-            // collection = await this._collectionManager.CreateCollection(record.name);
-            collection = new Collection({
-                Name: record.name,
-                Movies: [],
-            });
-            this._collectionList.push(collection);
-        }
-
-        return collection;
+        // return await this._collectionManager.CreateOrGetCollection(record.name);
+        return await this._collectionManager.CreateCollection(record.name);
     }
 
     /**
@@ -190,12 +167,8 @@ export class CsvObjectFactory {
 
         const genres: IGenre[] = [];
         for (const r of records) {
-            let genre: IGenre = await this._genreManager.GetGenreByName(r.name);
-
-            if (!genre) {
-                genre = await this._genreManager.CreateGenre(r.name);
-            }
-
+            // const genre = await this._genreManager.CreateOrGetGenre(r.name);
+            const genre = await this._genreManager.CreateGenre(r.name);
             genres.push(genre);
         }
 
@@ -220,12 +193,8 @@ export class CsvObjectFactory {
 
         const companies: ICompany[] = [];
         for (const r of records) {
-            let company: ICompany = await this._companyManager.GetCompanyByName(r.name);
-
-            if (!company) {
-                company = await this._companyManager.CreateCompany(r.name);
-            }
-
+            // const company = await this._companyManager.CreateOrGetCompany(r.name);
+            const company = await this._companyManager.CreateCompany(r.name);
             companies.push(company);
         }
 
@@ -248,12 +217,8 @@ export class CsvObjectFactory {
 
         const countries: ICountry[] = [];
         for (const r of records) {
-            let country: ICountry = await this._countryManager.GetCountryByName(r.name);
-
-            if (!country) {
-                country = await this._countryManager.CreateCountry(r.name, r.iso_3166_1);
-            }
-
+            // const country = await this._countryManager.CreateOrGetCountry(r.name, r.iso_3166_1);
+            const country = await this._countryManager.CreateCountry(r.name, r.iso_3166_1);
             countries.push(country);
         }
 
@@ -272,13 +237,7 @@ export class CsvObjectFactory {
             return [];
         }
 
-        let records: any[];
-
-        try {
-            records = JSON.parse(this.properJsonFormat(data));
-        } catch (e) {
-            logger.debug(data);
-        }
+        const records: any[] = JSON.parse(this.properJsonFormat(data));
 
         const languages: ILanguage[] = [];
         for (const r of records) {
@@ -286,12 +245,8 @@ export class CsvObjectFactory {
                 continue;
             }
 
-            let language: ILanguage = await this._languageManager.GetLanguageByName(r.name);
-
-            if (!language) {
-                language = await this._languageManager.CreateLanguage(r.iso_639_1, r.name);
-            }
-
+            // const language = await this._languageManager.CreateOrGetLanguage(r.name, r.iso_639_1);
+            const language = await this._languageManager.CreateLanguage(r.name, r.iso_639_1);
             languages.push(language);
         }
 
