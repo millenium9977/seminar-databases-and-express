@@ -1,17 +1,17 @@
-import {injectable} from 'tsyringe';
-import {CollectionManager} from '../../logic/collection-manager';
-import {GenreManager} from '../../logic/genre-manager';
-import {CompanyManager} from '../../logic/company-manager';
-import {CountryManager} from '../../logic/country-manager';
-import {LanguageManager} from '../../logic/language-manager';
-import {MovieMdManager} from '../../logic/movieMd-manager';
-import logger from '../../common/logger';
-import {ILanguage} from '../schemas/language-schema';
-import {ICountry} from '../schemas/country-schema';
-import {ICompany} from '../schemas/company-schema';
-import {IGenre} from '../schemas/genre-schema';
-import {ICollection} from '../schemas/collection-schema';
-import {IMovieMetadata} from '../schemas/movie-metadata-schema';
+import {injectable}              from 'tsyringe';
+import {CollectionManager}       from '../../logic/collection-manager';
+import {GenreManager}            from '../../logic/genre-manager';
+import {CompanyManager}          from '../../logic/company-manager';
+import {CountryManager}          from '../../logic/country-manager';
+import {LanguageManager}         from '../../logic/language-manager';
+import {MovieMdManager}          from '../../logic/movieMd-manager';
+import logger                    from '../../common/logger';
+import {ILanguage}               from '../schemas/language-schema';
+import {ICountry}                from '../schemas/country-schema';
+import {ICompany}                from '../schemas/company-schema';
+import {IGenre}                  from '../schemas/genre-schema';
+import Collection, {ICollection} from '../schemas/collection-schema';
+import {IMovieMetadata}          from '../schemas/movie-metadata-schema';
 
 @injectable()
 export class CsvObjectFactory {
@@ -22,7 +22,20 @@ export class CsvObjectFactory {
         private readonly _countryManager: CountryManager,
         private readonly _languageManager: LanguageManager,
         private readonly _movieMdManager: MovieMdManager) {
+        this._countryList    = [];
+        this._collectionList = [];
+        this._companyList    = [];
+        this._movieList      = [];
+        this._genreList      = [];
+        this._languageList   = [];
     }
+
+    private readonly _movieList: IMovieMetadata[];
+    private readonly _genreList: IGenre[];
+    private readonly _countryList: ICountry[];
+    private readonly _languageList: ILanguage[];
+    private readonly _companyList: ICompany[];
+    private readonly _collectionList: ICollection[];
 
     /**
      * Array Has to be like (but obviously [] starts by zero ;D )
@@ -55,13 +68,31 @@ export class CsvObjectFactory {
      */
     public async CreateMovieMD(data: any[]): Promise<void> {
         const collection: ICollection = await this.createCollections(data[1]);
-        const genres: IGenre[] = await this.createGenres(data[3]);
-        const countries: ICountry[] = await this.createCounties(data[13]);
-        const companies: ICompany[] = await this.createCompanies(data[12]);
-        const languages: ILanguage[] = await this.createLanguages(data[17]);
+        const genres: IGenre[]        = await this.createGenres(data[3]);
+        const countries: ICountry[]   = await this.createCounties(data[13]);
+        const companies: ICompany[]   = await this.createCompanies(data[12]);
+        const languages: ILanguage[]  = await this.createLanguages(data[17]);
+
+        const adult: boolean  = this.parseToBool(data[0]);
+        const video: boolean  = this.parseToBool(data[21]);
+        let revenue: number   = parseInt(data[15]);
+        let runtime: number   = parseInt(data[16]);
+        let voteCount: number = parseInt(data[23]);
+
+        if (isNaN(runtime)) {
+            runtime = 0;
+        }
+
+        if (isNaN(revenue)) {
+            revenue = 0;
+        }
+
+        if (isNaN(voteCount)) {
+            voteCount = 0;
+        }
 
         let movie: IMovieMetadata = await this._movieMdManager.CreateMovieMetadata(
-            data[0],
+            adult,
             data[22] | 0,
             data[2] | 0,
             data[4],
@@ -70,13 +101,13 @@ export class CsvObjectFactory {
             data[9],
             data[10] | 0,
             data[14],
-            data[15],
-            data[16],
+            revenue,
+            runtime,
             data[18],
             data[19],
             data[20],
-            data[21],
-            data[23]
+            video,
+            voteCount,
         );
 
         movie = await this._movieMdManager.AddGenres(movie, genres);
@@ -84,6 +115,17 @@ export class CsvObjectFactory {
         movie = await this._movieMdManager.AddCompanies(movie, companies);
         movie = await this._movieMdManager.AddCountries(movie, countries);
         await this._movieMdManager.AddLanguages(movie, languages);
+    }
+
+    private parseToBool(value: string) {
+        value = value.toLowerCase();
+        if (value === 'true') {
+            return true;
+        } else if (value === 'false') {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -97,8 +139,8 @@ export class CsvObjectFactory {
      */
     private properJsonFormat(data: string): string {
         let json: string = data.replace(/"/g, '\'');
-        json = json.replace(/\\/g, '');
-        json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
+        json             = json.replace(/\\/g, '');
+        json             = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
         return json.replace(/None/g, 'null');
     }
 
@@ -110,17 +152,23 @@ export class CsvObjectFactory {
      * @param movieMD MovieMetadata to add to the list
      * @constructor
      */
-    private async createCollections(data: string): Promise<ICollection> {
+    private createCollections(data: string): ICollection {
         if (!data) {
             return null;
         }
 
         const record: any = JSON.parse(this.properJsonFormat(data));
 
-        let collection: ICollection = await this._collectionManager.GetCollectionByName(record.name);
+        let collection: ICollection = this._collectionList.find((c) => c.Name === record.name);
+        // let collection: ICollection = await this._collectionManager.GetCollectionByName(record.name);
 
         if (!collection) {
-            collection = await this._collectionManager.CreateCollection(record.name);
+            // collection = await this._collectionManager.CreateCollection(record.name);
+            collection = new Collection({
+                Name: record.name,
+                Movies: [],
+            });
+            this._collectionList.push(collection);
         }
 
         return collection;

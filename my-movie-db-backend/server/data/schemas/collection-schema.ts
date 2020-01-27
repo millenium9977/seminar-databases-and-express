@@ -11,8 +11,7 @@ export interface ICollection extends Document {
 
 export const CollectionSchema: Schema = new Schema({
     Name: {type: String, required: true},
-    Id: {type: String, required: true},
-    Movies: [{type: Schema.Types.ObjectId, ref: MovieMetadataSchemaName, required: false}],
+    Movies: [{type: Schema.Types.ObjectId, ref: 'MovieMetadata', required: false}],
 });
 
 export default mongoose.model<ICollection>(CollectionSchemaName, CollectionSchema);

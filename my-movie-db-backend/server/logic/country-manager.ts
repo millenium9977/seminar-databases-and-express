@@ -1,4 +1,4 @@
-import {singleton} from 'tsyringe';
+import {singleton}         from 'tsyringe';
 import Country, {ICountry} from '../data/schemas/country-schema';
 
 @singleton()
@@ -9,6 +9,11 @@ export class CountryManager {
     }
 
     public async CreateCountry(name: string, code: string): Promise<ICountry> {
+        const result: ICountry = await this.GetCountryByName(name);
+        if (result) {
+            return result;
+        }
+
         const country: ICountry = new Country({
             Code: code,
             Name: name,

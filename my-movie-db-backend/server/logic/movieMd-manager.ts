@@ -10,7 +10,7 @@ import {ILanguage} from '../data/schemas/language-schema';
 export class MovieMdManager {
 
     public async CreateMovieMetadata(
-        adult: boolean = null,
+        adult: boolean = false,
         averageVote: number = null,
         budget: number = null,
         homepage: string = null,
@@ -24,9 +24,14 @@ export class MovieMdManager {
         status: string = null,
         tagline: string = null,
         title: string,
-        video: string = null,
+        video: boolean = false,
         voteCount: number = null,
     ): Promise<IMovieMetadata> {
+        const result = await MovieMetadata.findOne({Title: title});
+        if(result) {
+            return result;
+        }
+
         const movie = new MovieMetadata({
             Adult: adult,
             Budget: budget,

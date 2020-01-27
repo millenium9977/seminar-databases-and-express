@@ -10,6 +10,11 @@ export class LanguageManager {
     }
 
     public async CreateLanguage(code: string, name: string): Promise<ILanguage> {
+        const result: ILanguage = await this.GetLanguageByName(name);
+        if(result) {
+            return  result;
+        }
+
         const language: ILanguage = new Language({
             Name: name,
             Code: code,

@@ -1,4 +1,4 @@
-import {singleton} from 'tsyringe';
+import {singleton}          from 'tsyringe';
 import Comapany, {ICompany} from '../data/schemas/company-schema';
 
 @singleton()
@@ -9,6 +9,11 @@ export class CompanyManager {
     }
 
     public async CreateCompany(name: string): Promise<ICompany> {
+        const result = await this.GetCompanyByName(name);
+        if (result) {
+            return result;
+        }
+
         const company: ICompany = new Comapany({
             Name: name,
             Movies: [],

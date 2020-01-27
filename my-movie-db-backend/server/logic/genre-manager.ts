@@ -9,6 +9,11 @@ export class GenreManager {
     }
 
     public async CreateGenre(name: string): Promise<IGenre> {
+        const result = await this.GetGenreByName(name);
+        if(result) {
+            return result;
+        }
+
         const genre: IGenre = new Gerne({
             Name: name,
         });

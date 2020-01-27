@@ -10,6 +10,11 @@ export class CollectionManager {
     }
 
     public async CreateCollection(name: string): Promise<ICollection> {
+        const result: ICollection = await this.GetCollectionByName(name);
+        if(result) {
+            return result;
+        }
+
         const collection: ICollection = new Collection({
             Name: name,
             Movies: [],
