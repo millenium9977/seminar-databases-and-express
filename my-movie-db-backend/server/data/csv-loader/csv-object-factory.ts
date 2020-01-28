@@ -1,7 +1,7 @@
 import {injectable} from 'tsyringe';
-import MovieMetadata from '../../cross-cutting/data_classes/movie-metadata';
-import Collection from '../../cross-cutting/data_classes/collection';
-import Genre from '../../cross-cutting/data_classes/genre';
+import {MovieMetadata} from '../../cross-cutting/data_classes/movie-metadata';
+import {Collection} from '../../cross-cutting/data_classes/collection';
+import {Genre} from '../../cross-cutting/data_classes/genre';
 import {Company} from '../../cross-cutting/data_classes/company';
 import {Country} from '../../cross-cutting/data_classes/country';
 import {Language} from '../../cross-cutting/data_classes/language';
@@ -146,10 +146,13 @@ export class CsvObjectFactory {
             let genre: Genre = this._genreManager.GetGenreByName(r.name);
 
             if (!genre) {
-                genre = {
-                    Id: r.id,
-                    Name: r.name,
-                };
+                genre = new Genre();
+                genre.Name = r.name;
+
+                //     {
+                //     Id: r.id,
+                //     Name: r.name,
+                // };
 
                 this._genreManager.SaveGenre(genre);
             }
@@ -221,11 +224,14 @@ export class CsvObjectFactory {
             let country: Country = this._countryManager.GetCountryByName(r.name);
 
             if (!country) {
-                country = {
-                    Id: null,
-                    Name: r.name,
-                    Code: r.iso_3166_1,
-                };
+                country = new Country();
+                country.Name = r.name;
+                country.Code = r.iso_3166;
+                // country = {
+                //     Id: null,
+                //     Name: r.name,
+                //     Code: r.iso_3166_1,
+                // };
 
                 this._countryManager.SaveCountry(country);
             }
@@ -261,11 +267,15 @@ export class CsvObjectFactory {
             let language: Language = this._languageManager.GetLanguageByName(r.name);
 
             if (!language) {
-                language = {
-                    Id: null,
-                    Name: r.name,
-                    Code: r.iso_639_1,
-                };
+                // language = {
+                //     Id: null,
+                //     Name: r.name,
+                //     Code: r.iso_639_1,
+                // };
+
+                language = new Language();
+                language.Name = r.name;
+                language.Code = r.iso_639_4;
 
                 this._languageManager.SaveLanguage(language);
             }

@@ -12,15 +12,18 @@
     "test:debug": "mocha --inspect-brk test/**/*.ts --exit"
   },
   "dependencies": {
+    "@types/node": "^13.5.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "csv": "^5.3.1",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "express-openapi-validator": "^2.12.1",
+    "mysql2": "^2.1.0",
     "pino": "^5.13.4",
     "reflect-metadata": "^0.1.13",
-    "tsyringe": "^4.0.1"
+    "tsyringe": "^4.0.1",
+    "typeorm": "^0.2.22"
   },
   "devDependencies": {
     "@types/chai": "^4.2.3",

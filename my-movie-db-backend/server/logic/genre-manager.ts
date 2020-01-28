@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import Genre from '../cross-cutting/data_classes/genre';
+import {Genre} from '../cross-cutting/data_classes/genre';
 import {IGenreManager} from './contracts/i-genre-manager';
 
 @singleton()

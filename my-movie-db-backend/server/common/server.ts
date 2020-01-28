@@ -1,30 +1,40 @@
 import express from 'express';
-import {Application} from 'express';
-import path from 'path';
-import bodyParser from 'body-parser';
-import http from 'http';
-import os from 'os';
-import cookieParser from 'cookie-parser';
-import installValidator from './openapi';
+import {Application}        from 'express';
+import path                from 'path';
+import bodyParser          from 'body-parser';
+import http                from 'http';
+import os                  from 'os';
+import cookieParser        from 'cookie-parser';
+import installValidator    from './openapi';
 import 'reflect-metadata';
-import logger from './logger';
-import {container} from 'tsyringe';
-import {CsvLoaderManager} from '../data/csv-loader/csv-loader-manager';
+import logger              from './logger';
+import {container}         from 'tsyringe';
+import {CsvLoaderManager}  from '../data/csv-loader/csv-loader-manager';
+import {RepositoryService} from '../data/database/repository-service';
 
 const app = express();
 
 export default class ExpressServer {
+    private readonly _csvLoaderManager: CsvLoaderManager;
+    private readonly _repositoryService: RepositoryService;
+
     constructor() {
         const root = path.normalize(__dirname + '/../..');
         app.set('appPath', root + 'client');
         app.use(bodyParser.json({limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(bodyParser.urlencoded({extended: true, limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(bodyParser.text({limit: process.env.REQUEST_LIMIT || '100kb'}));
-        // app.use(cookieParser(process.env.SESSION_SECRET));
         app.use(express.static(`${root}/public`));
 
-        const csvLoaderManager: CsvLoaderManager = container.resolve(CsvLoaderManager);
-        csvLoaderManager.LoadCSV();
+        this._csvLoaderManager   = container.resolve(CsvLoaderManager);
+        this._repositoryService = container.resolve(RepositoryService);
+
+    }
+
+    public async Setup(): Promise<ExpressServer> {
+        await this._repositoryService.InitDatabase();
+        // this._csvLoaderManager.LoadCSV();
+        return this;
     }
 
     router(routes: (app: Application) => void): ExpressServer {

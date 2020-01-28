@@ -1,7 +1,14 @@
-import MovieMetadata from "./movie-metadata";
+import {MovieMetadata}                                                             from './movie-metadata';
+import {BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 
-export class Company {
+@Entity()
+export class Company extends BaseEntity {
+    @PrimaryGeneratedColumn()
     public Id: string;
+    @Column()
     public Name: string;
+    @ManyToMany(type => MovieMetadata,
+        movie => movie.ProductionCompanies)
+    @JoinTable()
     public Movies: MovieMetadata[];
 }

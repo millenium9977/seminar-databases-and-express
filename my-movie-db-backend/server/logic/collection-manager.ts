@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import Collection from '../cross-cutting/data_classes/collection';
+import {Collection} from '../cross-cutting/data_classes/collection';
 import {ICollectionManager} from './contracts/i-collection-manager';
 
 

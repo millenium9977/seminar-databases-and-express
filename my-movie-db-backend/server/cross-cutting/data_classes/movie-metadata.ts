@@ -1,11 +1,15 @@
-import Collection from './collection';
-import Genre from './genre';
-import {Company} from './company';
-import {Language} from './language';
-import {Country} from './country';
+import {Collection}                                                     from './collection';
+import {Genre}                                                          from './genre';
+import {Company}                                                        from './company';
+import {Language}                                                       from './language';
+import {Country}                                                        from './country';
+import {BaseEntity, Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 
-export default class MovieMetadata {
+@Entity()
+export class MovieMetadata extends BaseEntity {
+    @PrimaryGeneratedColumn()
     public Id: string;
+    @Column()
     public Adult: boolean;
     public Collection: Collection;
     public Budget: number;
@@ -15,6 +19,8 @@ export default class MovieMetadata {
     public OriginalTitle: string;
     public Overview: string;
     public Popularity: number;
+    @ManyToMany(type => Company,
+        company => company.Movies)
     public ProductionCompanies: Company[];
     public ProductionCountries: Country[];
     public ReleaseDate: string;
