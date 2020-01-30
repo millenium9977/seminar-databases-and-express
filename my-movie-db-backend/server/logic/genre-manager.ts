@@ -1,25 +1,32 @@
-import {singleton} from 'tsyringe';
-import {Genre} from '../cross-cutting/data_classes/genre';
-import {IGenreManager} from './contracts/i-genre-manager';
+import {injectable}                from 'tsyringe';
+import {Genre}                     from '../cross-cutting/data_classes/genre';
+import {getRepository, Repository} from 'typeorm';
 
-@singleton()
-export class GenreManager implements IGenreManager {
-    private _genres: Genre[];
+@injectable()
+export class GenreManager {
 
-    constructor() {
-        this._genres = [];
+    public async GetGenreByName(name: string): Promise<Genre> {
+        return getRepository(Genre).findOne({Name: name});
     }
 
-    public GetGenreByName(search: string): Genre {
-        return this._genres.find((g) => g.Name === search);
-    }
+    public async GetOrSaveGenre(name: string): Promise<Genre> {
+        const repository: Repository<Genre> = getRepository(Genre);
+        let genre: Genre;
 
-    public SaveGenre(genre: Genre): Genre {
-        if (!genre) {
-            return null;
+        try {
+            genre = await repository.findOne({Name: name});
+            if (genre) {
+                return genre;
+            }
+
+            genre = {
+                Id: null,
+                Name: name,
+            };
+            genre = await repository.save(genre);
+        } catch (err) {
+            genre = await repository.findOne({Name: name});
         }
-
-        this._genres.push(genre);
 
         return genre;
     }

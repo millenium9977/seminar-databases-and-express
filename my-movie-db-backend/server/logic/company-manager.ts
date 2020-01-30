@@ -1,25 +1,33 @@
-import {singleton} from 'tsyringe';
-import {Company} from '../cross-cutting/data_classes/company';
-import {ICompanyManager} from './contracts/i-company-manager';
+import {singleton}                 from 'tsyringe';
+import {Company}                   from '../cross-cutting/data_classes/company';
+import {getRepository, Repository} from 'typeorm';
 
 @singleton()
-export class CompanyManager implements ICompanyManager {
-    private _companies: Company[];
-
-    constructor() {
-        this._companies = [];
+export class CompanyManager {
+    public async GetCompanyByName(name: string): Promise<Company> {
+        return await getRepository(Company).findOne({Name: name});
     }
 
-    public GetCompanyByName(search: string): Company {
-        return this._companies.find((p) => p.Name === search);
-    }
+    public async SaveOrGetCompany(name: string): Promise<Company> {
+        const repository: Repository<Company> = getRepository(Company);
+        let company: Company;
 
-    public SaveCompany(company: Company): Company {
-        if (!company) {
-            return null;
+        try {
+            company = await repository.findOne({Name: name});
+            if (company) {
+                return company;
+            }
+
+            company = {
+                Id: null,
+                Name: name,
+                Movies: [],
+            };
+
+            company = await repository.save(company);
+        } catch (err) {
+            company = await repository.findOne({Name: name});
         }
-
-        this._companies.push(company);
 
         return company;
     }

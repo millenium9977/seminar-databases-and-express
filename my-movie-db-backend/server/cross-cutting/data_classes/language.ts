@@ -1,13 +1,15 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity} from 'typeorm';
+import {EntityBase}                             from './entity-base';
 
 @Entity()
-export class Language extends BaseEntity{
-    @PrimaryGeneratedColumn()
-    public Id: string;
+export class Language extends EntityBase {
+    @Column({
+        default: '',
+        nullable: true,
+    })
+    public Code: string;
     @Column({
         unique: true,
     })
-    public Code: string;
-    @Column()
     public Name: string;
 }

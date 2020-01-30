@@ -37,6 +37,6 @@ module.exports = {
             "always"
         ],
         curly: 2,
-        "no-unused-vars": 0
+        "no-unused-vars": 0,
     }
 };

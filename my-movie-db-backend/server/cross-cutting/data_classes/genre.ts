@@ -1,11 +1,11 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity} from 'typeorm';
+import {EntityBase}     from './entity-base';
 
 @Entity()
-export class Genre extends BaseEntity{
-    @PrimaryGeneratedColumn()
-    public Id: string;
+export class Genre extends EntityBase {
     @Column({
         unique: true,
     })
     public Name: string;
+
 }

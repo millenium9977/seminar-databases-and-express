@@ -32,8 +32,11 @@ export default class ExpressServer {
     }
 
     public async Setup(): Promise<ExpressServer> {
-        await this._repositoryService.InitDatabase();
-        // this._csvLoaderManager.LoadCSV();
+        const connectionStatus: boolean = await this._repositoryService.InitDatabase();
+        if(!connectionStatus) {
+            throw new Error('Wasn\'t able to establish a connection to the database');
+        }
+        await this._csvLoaderManager.LoadCSV();
         return this;
     }
 

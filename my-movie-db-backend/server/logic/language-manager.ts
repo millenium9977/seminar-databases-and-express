@@ -1,26 +1,34 @@
-import {Language} from '../cross-cutting/data_classes/language';
-import {ILanguageManager} from './contracts/i-language-manager';
-import {singleton} from 'tsyringe';
+import {Language}                  from '../cross-cutting/data_classes/language';
+import {singleton}                 from 'tsyringe';
+import {getRepository, Repository} from 'typeorm';
 
 @singleton()
-export class LanguageManager implements ILanguageManager {
-    private _languages: Language[];
+export class LanguageManager {
 
-    constructor() {
-        this._languages = [];
+    public async GetLanguageByName(name: string): Promise<Language> {
+        return await getRepository(Language).findOne({Name: name});
     }
 
+    public async SaveOrGetLanguage(name: string, code: string = ''): Promise<Language> {
+        const repository: Repository<Language> = getRepository(Language);
+        let language: Language;
 
-    public GetLanguageByName(search: string): Language {
-        return this._languages.find((l) => l.Name === search);
-    }
+        try {
+            language = await repository.findOne({Name: name});
+            if (language) {
+                return language;
+            }
 
-    public SaveLanguage(language: Language): Language {
-        if (!language) {
-            return null;
+            language = {
+                Id: null,
+                Name: name,
+                Code: code,
+            };
+
+            language = await repository.save(language);
+        } catch (err) {
+            language = await repository.findOne({Name: name});
         }
-
-        this._languages.push(language);
 
         return language;
     }

@@ -1,14 +1,15 @@
-import {MovieMetadata}                                                                       from './movie-metadata';
-import {BaseEntity, Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Movie}                                from './movie';
+import {Column, Entity, JoinTable, OneToMany} from 'typeorm';
+import {EntityBase}                           from './entity-base';
 
 @Entity()
-export class Collection extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    public Id: string;
-    @Column()
+export class Collection extends EntityBase {
+    public static readonly MoviesProperty: string = 'Movies';
+
+    @Column({unique: true})
     public Name: string;
-    @OneToMany(type => MovieMetadata,
+    @OneToMany(type => Movie,
         movie => movie.Collection)
     @JoinTable()
-    public Movies: MovieMetadata[];
+    public Movies: Movie[];
 }

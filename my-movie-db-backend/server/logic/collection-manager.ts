@@ -1,26 +1,36 @@
-import {singleton} from 'tsyringe';
-import {Collection} from '../cross-cutting/data_classes/collection';
-import {ICollectionManager} from './contracts/i-collection-manager';
+import {injectable} from 'tsyringe';
+import {Collection}                from '../cross-cutting/data_classes/collection';
+import {getRepository, Repository} from 'typeorm';
 
 
-//TODO: has to be singleton until we have a database running in the background
-@singleton()
-export class CollectionManager implements ICollectionManager {
-    //TODO: take the pain away asap
-    private _collectionList: Collection[];
+@injectable()
+export class CollectionManager {
 
-    constructor() {
-        this._collectionList = [];
+    public async GetCollectionByName(name: string): Promise<Collection> {
+        return await getRepository(Collection).findOne({Name: name});
     }
 
-    public GetCollectionByName(search: string): Collection {
-        //TODO: replaced with database operation
-        return this._collectionList.find((c) => c.Name === search);
-    }
+    public async GetOrSaveCollection(name: string): Promise<Collection> {
+        const repository: Repository<Collection> = getRepository(Collection);
+        let collection: Collection;
 
-    public SaveCollection(collection: Collection): Collection {
-        //TODO: replace with database operation
-        this._collectionList.push(collection);
+        try {
+            collection = await repository.findOne({Name: name});
+            if(collection) {
+                return collection;
+            }
+
+            collection = {
+                Id: null,
+                Name: name,
+                Movies: [],
+            };
+
+            collection = await repository.save(collection);
+        } catch (err) {
+            collection = await repository.findOne({Name: name});
+        }
+
         return collection;
     }
 }

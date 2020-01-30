@@ -1,13 +1,16 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {BaseEntity, Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Movie}                                                          from './movie';
+import {EntityBase}                                                     from './entity-base';
 
 @Entity()
-export class Country extends BaseEntity{
-    @PrimaryGeneratedColumn()
-    public Id: string;
+export class Country extends EntityBase{
     @Column({
-        unique: true,
+        nullable: true,
+        default: '',
     })
     public Code: string;
-    @Column()
+    @Column(
+        {unique: true}
+    )
     public Name: string;
 }
