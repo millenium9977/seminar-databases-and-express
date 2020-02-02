@@ -1,17 +1,16 @@
-import {injectable}        from 'tsyringe';
-import {Movie}             from '../../cross-cutting/data_classes/movie';
-import {Collection}        from '../../cross-cutting/data_classes/collection';
-import {Genre}             from '../../cross-cutting/data_classes/genre';
-import {Company}           from '../../cross-cutting/data_classes/company';
-import {Country}           from '../../cross-cutting/data_classes/country';
-import {Language}          from '../../cross-cutting/data_classes/language';
+import {injectable} from 'tsyringe';
+import {Collection} from '../../cross-cutting/data_classes/collection';
+import {Genre} from '../../cross-cutting/data_classes/genre';
+import {Company} from '../../cross-cutting/data_classes/company';
+import {Country} from '../../cross-cutting/data_classes/country';
+import {Language} from '../../cross-cutting/data_classes/language';
 import {CollectionManager} from '../../logic/collection-manager';
-import {GenreManager}      from '../../logic/genre-manager';
-import {CompanyManager}    from '../../logic/company-manager';
-import {CountryManager}    from '../../logic/country-manager';
-import {LanguageManager}   from '../../logic/language-manager';
-import {MovieManager}      from '../../logic/movie-manager';
-import logger              from '../../common/logger';
+import {GenreManager} from '../../logic/genre-manager';
+import {CompanyManager} from '../../logic/company-manager';
+import {CountryManager} from '../../logic/country-manager';
+import {LanguageManager} from '../../logic/language-manager';
+import {MovieManager} from '../../logic/movie-manager';
+import logger from '../../common/logger';
 
 @injectable()
 export class CsvObjectFactory {
@@ -25,7 +24,7 @@ export class CsvObjectFactory {
     }
 
     /**
-     * Array Has to be like (but obviously [] starts by zero ;D )
+     * Array Has to be like (but obviously [] starts by zero ;D)
      *  1 - Adult
      *  2 - Collection
      *  3 - Budget
@@ -55,12 +54,11 @@ export class CsvObjectFactory {
      */
     public async CreateMovieMD(data: any[]): Promise<void> {
         const collection: Collection = await this.createCollections(data[1]);
-        const genres: Genre[]        = await this.createGenres(data[3]);
+        const genres: Genre[] = await this.createGenres(data[3]);
         const countries: Country[]   = await this.createCountries(data[13]);
         const companies: Company[]   = await this.createCompanies(data[12]);
         const languages: Language[]  = await this.createLanguages(data[17]);
-
-        const movie = await this._movieManager.SaveMovie(
+        const movie = await this._movieManager.GetOrSaveMovie(
             data[0],
             data[22] | 0,
             data[2] | 0,
@@ -76,16 +74,11 @@ export class CsvObjectFactory {
             data[21],
             data[23],
         );
-
         await this._movieManager.SetLanguages(movie, languages);
         await this._movieManager.SetGenres(movie, genres);
         await this._movieManager.SetCountries(movie, countries);
         await this._movieManager.SetCollection(movie, collection);
-        try {
-            await this._movieManager.SetCompanies(movie, companies);
-        } catch (err) {
-            logger.error(err);
-        }
+        await this._movieManager.SetCompanies(movie, companies);
     }
 
     /**
@@ -99,8 +92,8 @@ export class CsvObjectFactory {
      */
     private properJsonFormat(data: string): string {
         let json: string = data.replace(/"/g, '\'');
-        json             = json.replace(/\\/g, '');
-        json             = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
+        json = json.replace(/\\/g, '');
+        json = json.replace(/((?<=({))'|(?<=(: ))'|'(?=[:,}])|(?<=(, ))')/g, '"');
         return json.replace(/None/g, 'null');
     }
 
@@ -115,9 +108,7 @@ export class CsvObjectFactory {
         if (!data) {
             return null;
         }
-
         const record: any = JSON.parse(this.properJsonFormat(data));
-
         return await this._collectionManager.GetOrSaveCollection(record.name);
     }
 
@@ -132,16 +123,12 @@ export class CsvObjectFactory {
         if (!data) {
             return [];
         }
-
         const records: any[] = JSON.parse(this.properJsonFormat(data));
-
         const genres: Genre[] = [];
         for (const r of records) {
-
             const genre = await this._genreManager.GetOrSaveGenre(r.name);
             genres.push(genre);
         }
-
         return genres;
     }
 
@@ -153,11 +140,9 @@ export class CsvObjectFactory {
      * @constructor
      */
     private async createCompanies(data: string): Promise<Company[]> {
-
         if (!data) {
             return [];
         }
-
         let records: any[];
         try {
             records = JSON.parse(this.properJsonFormat(data));
@@ -165,13 +150,12 @@ export class CsvObjectFactory {
             logger.error(e);
             logger.debug(this.properJsonFormat(data));
         }
-
         const companies: Company[] = [];
         for (const r of records) {
             const company: Company = await this._companyManager.SaveOrGetCompany(r.name);
+            if(company === null) continue;
             companies.push(company);
         }
-
         return companies;
     }
 
@@ -186,15 +170,12 @@ export class CsvObjectFactory {
         if (!data) {
             return [];
         }
-
         const records: any[] = JSON.parse(this.properJsonFormat(data));
-
         const countries: Country[] = [];
         for (const r of records) {
             const country: Country = await this._countryManager.SaveOrGetCountry(r.name, r.iso_3166_1);
             countries.push(country);
         }
-
         return countries;
     }
 
@@ -209,22 +190,18 @@ export class CsvObjectFactory {
         if (!data) {
             return [];
         }
-
         let records: any[];
-
         try {
             records = JSON.parse(this.properJsonFormat(data));
         } catch (e) {
             logger.debug(data);
         }
-
         const languages: Language[] = [];
         for (const r of records) {
             const language = await this._languageManager.SaveOrGetLanguage(r.name, r.iso_639_1);
-
             languages.push(language);
         }
-
         return languages;
     }
+
 }
