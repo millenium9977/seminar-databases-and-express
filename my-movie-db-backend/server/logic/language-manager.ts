@@ -28,28 +28,35 @@ export class LanguageManager {
 
     }
 
-    public async CreateOrGetLanguage(name: string, code: string): Promise<ILanguage> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        try {
-            const opts = {session, new: true};
-            let language: ILanguage = await Language.findOne({Name: name}, opts);
-            if (!language) {
-                language = new Language({
-                    Name: name,
-                    Code: code,
-                });
-                await language.save(opts);
-            }
-            await session.commitTransaction();
-            session.endSession();
-            return language;
-        } catch (err) {
-            logger.error(err);
-            await session.abortTransaction();
-            session.endSession();
-            throw err;
-        }
+    public CreateLanguageObject(name: string, code: string): ILanguage {
+        return new Language({
+            Name: name,
+            Code: code,
+        });
     }
+
+    // public async CreateOrGetLanguage(name: string, code: string): Promise<ILanguage> {
+    //     const session = await mongoose.startSession();
+    //     session.startTransaction();
+    //     try {
+    //         const opts = {session, new: true};
+    //         let language: ILanguage = await Language.findOne({Name: name}, opts);
+    //         if (!language) {
+    //             language = new Language({
+    //                 Name: name,
+    //                 Code: code,
+    //             });
+    //             await language.save(opts);
+    //         }
+    //         await session.commitTransaction();
+    //         session.endSession();
+    //         return language;
+    //     } catch (err) {
+    //         logger.error(err);
+    //         await session.abortTransaction();
+    //         session.endSession();
+    //         throw err;
+    //     }
+    // }
 
 }

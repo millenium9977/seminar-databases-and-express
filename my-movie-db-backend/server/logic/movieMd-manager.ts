@@ -28,6 +28,11 @@ export class MovieMdManager {
         title: string,
         video: boolean = false,
         voteCount: number = null,
+        genres: IGenre[] = null,
+        companies: ICompany[] = null,
+        countries: ICountry[] = null,
+        languages: ILanguage[] = null,
+        collection: ICollection = null,
     ): Promise<IMovieMetadata> {
         try {
             let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title});
@@ -49,14 +54,29 @@ export class MovieMdManager {
                     Video: video,
                     AverageVote: averageVote,
                     VoteCount: voteCount,
-                    ProductionCompanies: [],
-                    ProductionCountries: [],
-                    Spoken_Languages: [],
-                    Genres: [],
-                    Collection: null,
+                    ProductionCompanies: companies,
+                    ProductionCountries: countries,
+                    Spoken_Languages: languages,
+                    Genres: genres,
+                    Collection: collection,
                 });
 
+
+
                 await movie.save();
+
+                if(collection != null) {
+                    collection.Movies.push(collection);
+                    await collection.save();
+                }
+
+                if(companies != null) {
+                    for (const company of companies) {
+                        company.Movies.push(movie);
+                        await company.save();
+                    }
+                }
+
             }
             return movie;
         } catch (e) {

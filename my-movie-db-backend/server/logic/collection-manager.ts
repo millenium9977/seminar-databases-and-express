@@ -51,4 +51,11 @@ export class CollectionManager {
             throw err;
         }
     }
+
+    public CreateCollectionObject(name: string) {
+        return new Collection({
+            Name: name,
+            Movies: []
+        });
+    }
 }

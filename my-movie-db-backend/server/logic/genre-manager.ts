@@ -10,6 +10,12 @@ export class GenreManager {
         return Genre.findOne({Name: name});
     }
 
+    public CreateGenreObject(name: string): IGenre {
+        return new Genre( {
+            Name: name
+        });
+    }
+
     public async CreateGenre(name: string): Promise<IGenre> {
         try {
             let genre: IGenre = await Genre.findOne({Name: name});
@@ -27,26 +33,26 @@ export class GenreManager {
 
     }
     
-    public async CreateOrGetGenre(name: string): Promise<IGenre> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        try {
-            const opts = {session, new: true};
-            let genre: IGenre = await Genre.findOne({Name: name}, opts);
-            if(!genre) {
-                genre = new Genre({
-                    Name: name,
-                });
-                await genre.save(opts);
-            }
-            await session.commitTransaction();
-            session.endSession();
-            return genre;
-        } catch (err) {
-            logger.error(err);
-            await session.abortTransaction();
-            session.endSession();
-            throw err;
-        }
-    }
+    // public async CreateOrGetGenre(name: string): Promise<IGenre> {
+    //     const session = await mongoose.startSession();
+    //     session.startTransaction();
+    //     try {
+    //         const opts = {session, new: true};
+    //         let genre: IGenre = await Genre.findOne({Name: name}, opts);
+    //         if(!genre) {
+    //             genre = new Genre({
+    //                 Name: name,
+    //             });
+    //             await genre.save(opts);
+    //         }
+    //         await session.commitTransaction();
+    //         session.endSession();
+    //         return genre;
+    //     } catch (err) {
+    //         logger.error(err);
+    //         await session.abortTransaction();
+    //         session.endSession();
+    //         throw err;
+    //     }
+    // }
 }

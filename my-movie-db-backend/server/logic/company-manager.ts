@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import Comapany, {ICompany} from '../data/schemas/company-schema';
+import Company, {ICompany} from '../data/schemas/company-schema';
 import mongoose from 'mongoose';
 import logger from '../common/logger';
 
@@ -7,14 +7,14 @@ import logger from '../common/logger';
 export class CompanyManager {
 
     public async GetCompanyByName(name: string): Promise<ICompany> {
-        return Comapany.findOne({Name: name});
+        return Company.findOne({Name: name});
     }
 
     public async CreateCompany(name: string): Promise<ICompany> {
         try {
-            let company: ICompany = await Comapany.findOne({Name: name});
+            let company: ICompany = await Company.findOne({Name: name});
             if (!company) {
-                company = new Comapany({
+                company = new Company({
                     Name: name,
                     Movies: [],
                 });
@@ -24,8 +24,15 @@ export class CompanyManager {
 
             return company;
         } catch (err) {
-            return Comapany.findOne({Name: name});
+            return Company.findOne({Name: name});
         }
+    }
+
+    public createCompanyObject(name: string): ICompany {
+        return new Company({
+            Name: name,
+            Movies: [],
+        });
     }
 
     public async CreateOrGetCompany(name: string): Promise<ICompany> {
@@ -33,9 +40,9 @@ export class CompanyManager {
         session.startTransaction();
         try {
             const opts = {session, new: true};
-            let company: ICompany = await Comapany.findOne({Name: name}, opts);
+            let company: ICompany = await Company.findOne({Name: name}, opts);
             if (!company) {
-                company = new Comapany({
+                company = new Company({
                     Name: name,
                     Movies: [],
                 });

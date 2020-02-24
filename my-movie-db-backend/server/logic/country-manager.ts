@@ -1,8 +1,5 @@
 import {singleton} from 'tsyringe';
 import Country, {ICountry} from '../data/schemas/country-schema';
-import mongoose from 'mongoose';
-import logger from '../common/logger';
-import {Company} from '../cross-cutting/data_classes/company';
 
 @singleton()
 export class CountryManager {
@@ -14,7 +11,7 @@ export class CountryManager {
     public async CreateCountry(name: string, code: string): Promise<ICountry> {
         try {
             let country: ICountry = await Country.findOne({Name: name});
-            if(!country) {
+            if (!country) {
                 country = new Country({
                     Name: name,
                     Code: code,
@@ -29,27 +26,34 @@ export class CountryManager {
         }
     }
 
-    public async CreateOrGetCountry(name: string, code: string): Promise<ICountry> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        try {
-            const opts = {session, new: true};
-            let country: ICountry = await Country.findOne({Name: name}, opts);
-            if (!country) {
-                country = new Country({
-                    Code: code,
-                    Name: name,
-                });
-                await country.save(opts);
-            }
-            await session.commitTransaction();
-            session.endSession();
-            return country;
-        } catch (err) {
-            logger.error(err);
-            await session.abortTransaction();
-            session.endSession();
-            throw err;
-        }
+    public CreateCountryObject(name: string, code: string): ICountry {
+        return new Country({
+            Name: name,
+            Code: code,
+        });
     }
+
+    // public async CreateOrGetCountry(name: string, code: string): Promise<ICountry> {
+    //     const session = await mongoose.startSession();
+    //     session.startTransaction();
+    //     try {
+    //         const opts = {session, new: true};
+    //         let country: ICountry = await Country.findOne({Name: name}, opts);
+    //         if (!country) {
+    //             country = new Country({
+    //                 Code: code,
+    //                 Name: name,
+    //             });
+    //             await country.save(opts);
+    //         }
+    //         await session.commitTransaction();
+    //         session.endSession();
+    //         return country;
+    //     } catch (err) {
+    //         logger.error(err);
+    //         await session.abortTransaction();
+    //         session.endSession();
+    //         throw err;
+    //     }
+    // }
 }
