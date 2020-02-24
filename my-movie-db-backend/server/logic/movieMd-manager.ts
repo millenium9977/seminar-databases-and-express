@@ -66,67 +66,67 @@ export class MovieMdManager {
     }
 
 
-    public async CreateOrGetMovieMetadata(
-        adult: boolean = false,
-        averageVote: number = null,
-        budget: number = null,
-        homepage: string = null,
-        originalLanguage: string = null,
-        originalTitle: string = null,
-        overview: string = null,
-        popularity: number = null,
-        releaseDate: string = null,
-        revenue: number = null,
-        runtime: number = null,
-        status: string = null,
-        tagline: string = null,
-        title: string,
-        video: boolean = false,
-        voteCount: number = null,
-    ): Promise<IMovieMetadata> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        try {
-            const opts = {session, new: true};
-            let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title}, opts);
-            if (!movie) {
-                movie = new MovieMetadata({
-                    Adult: adult,
-                    Budget: budget,
-                    Homepage: homepage,
-                    OriginalLanguage: originalLanguage,
-                    OriginalTitle: originalTitle,
-                    Overview: overview,
-                    Popularity: popularity,
-                    ReleaseDate: releaseDate,
-                    Revenue: revenue,
-                    Runtime: runtime,
-                    Status: status,
-                    Tagline: tagline,
-                    Title: title,
-                    Video: video,
-                    AverageVote: averageVote,
-                    VoteCount: voteCount,
-                    ProductionCompanies: [],
-                    ProductionCountries: [],
-                    Spoken_Languages: [],
-                    Genres: [],
-                    Collection: null,
-                });
-
-                await movie.save(opts);
-            }
-            await session.commitTransaction();
-            session.endSession();
-            return movie;
-        } catch (err) {
-            logger.error(err);
-            await session.abortTransaction();
-            session.endSession();
-            throw err;
-        }
-
-    }
+    // public async CreateOrGetMovieMetadata(
+    //     adult: boolean = false,
+    //     averageVote: number = null,
+    //     budget: number = null,
+    //     homepage: string = null,
+    //     originalLanguage: string = null,
+    //     originalTitle: string = null,
+    //     overview: string = null,
+    //     popularity: number = null,
+    //     releaseDate: string = null,
+    //     revenue: number = null,
+    //     runtime: number = null,
+    //     status: string = null,
+    //     tagline: string = null,
+    //     title: string,
+    //     video: boolean = false,
+    //     voteCount: number = null,
+    // ): Promise<IMovieMetadata> {
+    //     const session = await mongoose.startSession();
+    //     session.startTransaction();
+    //     try {
+    //         const opts = {session, new: true};
+    //         let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title}, opts);
+    //         if (!movie) {
+    //             movie = new MovieMetadata({
+    //                 Adult: adult,
+    //                 Budget: budget,
+    //                 Homepage: homepage,
+    //                 OriginalLanguage: originalLanguage,
+    //                 OriginalTitle: originalTitle,
+    //                 Overview: overview,
+    //                 Popularity: popularity,
+    //                 ReleaseDate: releaseDate,
+    //                 Revenue: revenue,
+    //                 Runtime: runtime,
+    //                 Status: status,
+    //                 Tagline: tagline,
+    //                 Title: title,
+    //                 Video: video,
+    //                 AverageVote: averageVote,
+    //                 VoteCount: voteCount,
+    //                 ProductionCompanies: [],
+    //                 ProductionCountries: [],
+    //                 Spoken_Languages: [],
+    //                 Genres: [],
+    //                 Collection: null,
+    //             });
+    //
+    //             await movie.save(opts);
+    //         }
+    //         await session.commitTransaction();
+    //         session.endSession();
+    //         return movie;
+    //     } catch (err) {
+    //         logger.error(err);
+    //         await session.abortTransaction();
+    //         session.endSession();
+    //         throw err;
+    //     }
+    //
+    // }
 
     public async GetMovieByTitle(title: string): Promise<IMovieMetadata> {
         return MovieMetadata.findOne({Title: title});
