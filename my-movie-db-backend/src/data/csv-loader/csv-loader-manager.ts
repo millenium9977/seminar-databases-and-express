@@ -12,7 +12,7 @@ export class CsvLoaderManager {
 
     private static readonly FILENAME                = '/movies_metadata.csv';
     private static readonly RELATIVE_DIRECTORY_PATH = '../../dataset';
-    private LOG_DATABASE = true;
+    private LOG_DATABASE = false;
 
     constructor(private readonly _csvObjectFactory: CsvObjectFactory,
         private readonly _timeMeasurementService: TimeMeasurementService) {
@@ -28,7 +28,8 @@ export class CsvLoaderManager {
             skip_empty_lines: true,
         });
         this._timeMeasurementService.Start();
-        for (let i = 0; i < records.length; i++) {
+        for (let i = 0; i < 1000 // juhu hier ist nicht 0
+            ; i++) {
             let r = records[i];
             try {
                 await this._csvObjectFactory.CreateMovieMD(r);
@@ -37,6 +38,45 @@ export class CsvLoaderManager {
                 logger.error(err);
             }
         }
+
+        /*ogmneo.Index.create('genre', 'name').then( async res => {
+            logger.info(JSON.stringify(res));
+            await ogmneo.Node.create({
+                name: 'name'
+            }, 'genre').then(async () => {
+                await ogmneo.Node.create({
+                    name: 'name'
+                }, 'genre').then(async () => {
+                    await ogmneo.Node.create({
+
+                    }, 'genre').then(async () => {
+                        await ogmneo.Node.delete({id: 'ztxcv', name: 'name'}).then( res =>
+                            logger.info(res)
+                        ).catch( err => logger.error(err))
+                        /!*ogmneo.Node.find(ogmneo.Query
+                            .create('genre')
+                            .where(
+                                new ogmneo.Where('name', { $eq: 'name' })
+                            )
+                        ).then( res =>
+                            logger.info(res)
+                        ).catch( err =>
+                            logger.error(err)
+                        );
+                        let query = ogmneo.Query
+                            .create('genre')
+                            .where(
+                                new ogmneo.Where('name', { $eq: 'name' })
+                            );
+                        ogmneo.Node.addLabelToNode('b', 13).then(res => logger.info(JSON.stringify(res)));*!/
+                    });
+                });
+            });
+        }).catch( err =>
+            logger.error(err)
+        );*/
+        //await ogmneo.RelationQuery.create('name', 'genre').then(res => logger.info(res)).catch(err => logger.error(err));
+
         this._timeMeasurementService.Stop();
         logger.info('Finished inserting records');
         if(this.LOG_DATABASE) {
