@@ -36,7 +36,7 @@ export default class ExpressServer {
         if(!connectionStatus) {
             throw new Error('Wasn\'t able to establish a connection to the database');
         }
-        await this._csvLoaderManager.LoadCSV();
+        // await this._csvLoaderManager.LoadCSV();
         return this;
     }
 

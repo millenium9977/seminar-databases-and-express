@@ -51,14 +51,30 @@ export class CsvObjectFactory {
      *  23 - Vote_average
      *  24 - Vote_count
      * @param data List with the data to create the MovieMetadata
+     * @param relations If set to false no relations are set to the database
      * @constructor
      */
-    public async CreateMovieMD(data: any[]): Promise<void> {
-        const collection: Collection = await this.createCollections(data[1]);
-        const genres: Genre[]        = await this.createGenres(data[3]);
-        const countries: Country[]   = await this.createCountries(data[13]);
-        const companies: Company[]   = await this.createCompanies(data[12]);
-        const languages: Language[]  = await this.createLanguages(data[17]);
+    public async CreateMovieMD(data: any[], relations: boolean = true): Promise<void> {
+        let collection: Collection;
+        let genres: Genre[];
+        let countries: Country[];
+        let companies: Company[];
+        let languages: Language[];
+
+        if (relations) {
+            const result: any[] = await Promise.all([
+                this.createCollections(data[1]),
+                this.createGenres(data[3]),
+                this.createCountries(data[13]),
+                this.createCompanies(data[12]),
+                this.createLanguages(data[17])]);
+
+            collection= result[0];
+            genres = result[1];
+            countries = result[2];
+            companies = result[3];
+            languages = result[4];
+        }
 
         const movie = await this._movieManager.SaveMovie(
             data[0],
@@ -77,14 +93,16 @@ export class CsvObjectFactory {
             data[23],
         );
 
-        await this._movieManager.SetLanguages(movie, languages);
-        await this._movieManager.SetGenres(movie, genres);
-        await this._movieManager.SetCountries(movie, countries);
-        await this._movieManager.SetCollection(movie, collection);
-        try {
-            await this._movieManager.SetCompanies(movie, companies);
-        } catch (err) {
-            logger.error(err);
+        if (relations) {
+            await this._movieManager.SetLanguages(movie, languages);
+            await this._movieManager.SetGenres(movie, genres);
+            await this._movieManager.SetCountries(movie, countries);
+            await this._movieManager.SetCollection(movie, collection);
+            try {
+                await this._movieManager.SetCompanies(movie, companies);
+            } catch (err) {
+                logger.error(err);
+            }
         }
     }
 

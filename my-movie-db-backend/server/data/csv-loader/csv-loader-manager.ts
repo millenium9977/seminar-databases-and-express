@@ -12,40 +12,42 @@ export class CsvLoaderManager {
     private static readonly RELATIVE_DIRECTORY_PATH = '../../dataset';
 
 
-    constructor(private readonly _csvObjectFactory: CsvObjectFactory,
-        private readonly _timeMeasurementService: TimeMeasurementService) {
+    constructor(private readonly _csvObjectFactory: CsvObjectFactory) {
     }
 
-    public async LoadCSV() {
-
+    private getRecordsFromCSV(): any[] {
         const filepath: string = `${path.join(__dirname, CsvLoaderManager.RELATIVE_DIRECTORY_PATH)}${CsvLoaderManager.FILENAME}`;
-        logger.debug(`Loading csv from: ${filepath}`);
         const content: string = fs.readFileSync(filepath, 'utf8');
-        const records: any[]  = parse(content, {
+        return parse(content, {
             delimiter: ',',
             skip_lines_with_error: true,
             skip_empty_lines: true,
         });
-
-
-        this._timeMeasurementService.Start();
-        for (let i = 0; i < records.length; i++) {
-            let r = records[i];
-            try {
-                await this._csvObjectFactory.CreateMovieMD(r);
-            } catch (err) {
-                logger.debug('The csv loader catched it');
-                logger.error(err);
-            }
-        }
-        this._timeMeasurementService.Stop();
-        logger.info('Finished inserting records');
-        logger.info(`Time needed for insertion: ${this._timeMeasurementService.Result}`);
     }
 
-    // private LoadFile(error: NodeJS.ErrnoException | null, data: Buffer): void {
-    //     if (error) {
-    //         return logger.error(error);
-    //     }
-    // }
+    private async insertRecord(record: any, relations: boolean) {
+        try {
+            await this._csvObjectFactory.CreateMovieMD(record, relations);
+        } catch (err) {
+            return;
+        }
+    }
+
+    public async WithRelations(count: number) {
+        const records: any[] = this.getRecordsFromCSV();
+        const length = count > records.length ? records.length : count;
+        for (let i = 0; i < length; i++) {
+            await this.insertRecord(records[i], true);
+        }
+    }
+
+    public async WithoutRelations(count: number) {
+        const records: any[] = this.getRecordsFromCSV();
+        const length = count > records.length ? records.length : count;
+        for (let i = 0; i < length; i++) {
+            await this.insertRecord(records[i], false);
+        }
+    }
+
+
 }

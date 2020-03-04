@@ -1,11 +1,12 @@
-import {singleton}                 from 'tsyringe';
-import {Movie}                     from '../cross-cutting/data_classes/movie';
-import {getRepository, Repository} from 'typeorm';
-import {Collection}                from '../cross-cutting/data_classes/collection';
-import {Genre}                     from '../cross-cutting/data_classes/genre';
-import {Country}                   from '../cross-cutting/data_classes/country';
-import {Language}                  from '../cross-cutting/data_classes/language';
-import {Company}                   from '../cross-cutting/data_classes/company';
+import {singleton}                       from 'tsyringe';
+import {Movie}                           from '../cross-cutting/data_classes/movie';
+import {getRepository, Like, Repository} from 'typeorm';
+import {Collection}                      from '../cross-cutting/data_classes/collection';
+import {Genre}                           from '../cross-cutting/data_classes/genre';
+import {Country}                         from '../cross-cutting/data_classes/country';
+import {Language}                        from '../cross-cutting/data_classes/language';
+import {Company}                         from '../cross-cutting/data_classes/company';
+import logger                            from '../common/logger';
 
 @singleton()
 export class MovieManager {
@@ -117,5 +118,45 @@ export class MovieManager {
         }
 
         return await repositoryMovie.save(movieWithCompanies);
+    }
+
+    public async FilterWithWord(word: string): Promise<Movie[]> {
+        const repository: Repository<Movie> = getRepository(Movie);
+        return await repository.find({Title: Like(`%${word}%`)});
+    }
+
+    public async FilterWithLang(lang: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        return await repository
+            .createQueryBuilder('movie')
+            .leftJoinAndSelect('movie.Spoken_Languages', 'language')
+            .where('language.Name = :name', {name: lang})
+            .getMany();
+    }
+
+    public async FilterWithGenre(genre: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        return await repository
+            .createQueryBuilder('movie')
+            .leftJoinAndSelect('movie.Genres', 'genre')
+            .where('genre.Name = :name', {name: genre})
+            .getMany();
+    }
+
+    public async DeleteWithWord(word: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        return await repository.delete({Title: Like(`%${word}%`)});
+    }
+
+    public async DeleteWithLang(lang: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        const movies: Movie[] = await this.FilterWithLang(lang);
+        return await repository.remove(movies);
+    }
+
+    public async DeleteWithGenre(genre: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        const movies = await this.FilterWithGenre(genre);
+        return await repository.remove(movies);
     }
 }
