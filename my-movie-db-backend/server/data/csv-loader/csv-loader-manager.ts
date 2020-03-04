@@ -29,7 +29,7 @@ export class CsvLoaderManager {
 
 
         this._timeMeasurementService.Start();
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < records.length; i++) {
             let r = records[i];
             try {
                 await this._csvObjectFactory.CreateMovieMD(r);

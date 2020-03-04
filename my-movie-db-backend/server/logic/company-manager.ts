@@ -18,13 +18,10 @@ export class CompanyManager {
                 return company;
             }
 
-            company = {
+            company = await repository.save({
                 Id: null,
                 Name: name,
-                Movies: [],
-            };
-
-            company = await repository.save(company);
+            });
         } catch (err) {
             company = await repository.findOne({Name: name});
         }

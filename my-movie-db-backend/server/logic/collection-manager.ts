@@ -20,13 +20,10 @@ export class CollectionManager {
                 return collection;
             }
 
-            collection = {
+            collection = await repository.save({
                 Id: null,
                 Name: name,
-                Movies: [],
-            };
-
-            collection = await repository.save(collection);
+            });
         } catch (err) {
             collection = await repository.findOne({Name: name});
         }

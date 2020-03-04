@@ -22,7 +22,7 @@ export class Movie extends EntityBase {
     @Column({default: false, nullable: true})
     public Adult: boolean;
     @ManyToOne(type => Collection,
-        collection => collection.Id,
+        collection => collection.Movies,
         {
             eager: true,
         })

@@ -30,16 +30,12 @@ export class MovieManager {
             Adult: adult,
             Budget: budget,
             Collection: null,
-            Genres: [],
             Homepage: hompage,
             OriginalLanguage: originalLanguage,
             OriginalTitle: originalTitle,
             Overview: overview,
             Popularity: popularity,
-            ProductionCountries: [],
-            ProductionCompanies: [],
             ReleaseDate: releaseDate,
-            Spoken_Languages: [],
             Status: status,
             Tagline: tagline,
             Title: title,
@@ -107,9 +103,9 @@ export class MovieManager {
             return null;
         }
 
-        const repositoryMovie: Repository<Movie>           = getRepository(Movie);
+        const repositoryMovie: Repository<Movie>     = getRepository(Movie);
         const repositoryCompany: Repository<Company> = getRepository(Company);
-        const movieWithCompanies: Movie                   = await repositoryMovie.findOne(movie.Id, {relations: [Movie.CompaniesProperty]});
+        const movieWithCompanies: Movie              = await repositoryMovie.findOne(movie.Id, {relations: [Movie.CompaniesProperty]});
 
         for (const company of companies) {
             const companyWithMovies: Company = await repositoryCompany.findOne(company.Id, {relations: [Company.MoviesProperty]});
