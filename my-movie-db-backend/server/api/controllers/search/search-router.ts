@@ -13,7 +13,9 @@ export function SearchRoutes(): express.Router {
         .get('/withGenre/:genre',
             AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)))
         .get('/budget/:name',
-            AsyncExceptionHandler(controller.GetCompanyMoviesBudget.bind(controller)));
+            AsyncExceptionHandler(controller.GetCompanyMoviesBudget.bind(controller)))
+        .get('/compLang/:lang',
+            AsyncExceptionHandler(controller.AllCompaniesWithMovieLang.bind(controller)));
 }
 
 // Search:

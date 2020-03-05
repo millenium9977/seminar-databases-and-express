@@ -29,7 +29,7 @@ export class CompanyManager {
         return company;
     }
 
-    public async MoviesBudget(name: string) {
+    public async MoviesBudget(name: string): Promise<number> {
         const repository: Repository<Company> = getRepository(Company);
         const company: Company = await repository
             .findOne({where: {Name: Like(`%${name}%`)}, relations: [Company.MoviesProperty]});
@@ -38,5 +38,15 @@ export class CompanyManager {
         company.Movies.forEach( (m) => sum += m.Budget);
 
         return sum;
+    }
+
+    public async CompaniesByLang(lang: string): Promise<Company[]> {
+        const repository: Repository<Company> = getRepository(Company);
+        return repository
+            .createQueryBuilder('company')
+            .leftJoinAndSelect('company.Movies', 'movie')
+            .leftJoin('movie.Spoken_Languages', 'language')
+            .where('language.Name = :lang', {lang: lang})
+            .getMany();
     }
 }
