@@ -229,4 +229,17 @@ export class MovieMdManager {
 
         return movie.save();
     }
+
+    public async FilterWithWord(word: string): Promise<IMovieMetadata[]> {
+        const regEx = new RegExp(word, 'g');
+        return await MovieMetadata.find({Title: regEx});
+    }
+
+    public async FilterWithLang(lang: string): Promise<IMovieMetadata[]> {
+        return await MovieMetadata.find({'Spoken_Languages.Name': lang});
+    }
+
+    public async FilterWithGenre(genre: string): Promise<IMovieMetadata[]> {
+        return await MovieMetadata.find({'Genres.Name': genre});
+    }
 }

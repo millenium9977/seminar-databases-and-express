@@ -8,6 +8,6 @@ export function SaveRoutes(): Router {
     return Router()
         .get('/withRelations/:count',
             AsyncExceptionHandler(controller.WithRelations.bind(controller)))
-        .get('/noRealations/:count',
+        .get('/noRelations/:count',
             AsyncExceptionHandler(controller.NoRelations.bind(controller)));
 }

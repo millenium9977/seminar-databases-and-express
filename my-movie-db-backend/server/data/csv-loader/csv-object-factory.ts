@@ -92,9 +92,12 @@ export class CsvObjectFactory {
         }
 
         if (relations) {
-            [collection, companies] = await Promise.all(
+            const result: any[] = await Promise.all(
                 [this.collectionManager.GetCollectionByName(this.getCollectionName(data[1])),
                     this.getCompaniesByNames(data[12])]);
+
+            collection = result[0];
+            companies = result[1];
         }
 
         let movie: IMovieMetadata = await this.movieMdManager.CreateMovieMetadata(

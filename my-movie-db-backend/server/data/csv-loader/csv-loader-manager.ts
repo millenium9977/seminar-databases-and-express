@@ -29,7 +29,7 @@ export class CsvLoaderManager {
         const length = count > records.length ? records.length : count;
 
         if(relations) {
-            this.preloadRelations(records, length);
+            await this.preloadRelations(records, length);
         }
 
         for (let i = 0; i < length; i++) {
