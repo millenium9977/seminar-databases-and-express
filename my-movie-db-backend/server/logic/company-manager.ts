@@ -1,6 +1,6 @@
 import {singleton}                 from 'tsyringe';
-import {Company}                   from '../cross-cutting/data_classes/company';
-import {getRepository, Repository} from 'typeorm';
+import {Company}                         from '../cross-cutting/data_classes/company';
+import {getRepository, Like, Repository} from 'typeorm';
 
 @singleton()
 export class CompanyManager {
@@ -27,5 +27,16 @@ export class CompanyManager {
         }
 
         return company;
+    }
+
+    public async MoviesBudget(name: string) {
+        const repository: Repository<Company> = getRepository(Company);
+        const company: Company = await repository
+            .findOne({where: {Name: Like(`%${name}%`)}, relations: [Company.MoviesProperty]});
+
+        let sum = 0;
+        company.Movies.forEach( (m) => sum += m.Budget);
+
+        return sum;
     }
 }

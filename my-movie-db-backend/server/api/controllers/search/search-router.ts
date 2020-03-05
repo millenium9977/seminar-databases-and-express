@@ -8,10 +8,12 @@ export function SearchRoutes(): express.Router {
     return express.Router()
         .get('/movies/:word',
             AsyncExceptionHandler(controller.AllMoviesWith.bind(controller)))
-        .get('/WithLang/:lang',
+        .get('/withLang/:lang',
             AsyncExceptionHandler(controller.AllMoviesWithLang.bind(controller)))
-        .get('/WithGenre/:genre',
-            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)));
+        .get('/withGenre/:genre',
+            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)))
+        .get('/budget/:name',
+            AsyncExceptionHandler(controller.GetCompanyMoviesBudget.bind(controller)));
 }
 
 // Search:

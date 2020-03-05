@@ -8,9 +8,9 @@ export function DeleteRoutes(): express.Router {
     return express.Router()
         .get('/movies/:word',
             AsyncExceptionHandler(controller.AllMoviesWith.bind(controller)))
-        .get('/WithLang/:lang',
+        .get('/withLang/:lang',
             AsyncExceptionHandler(controller.AllMoviesWithLang.bind(controller)))
-        .get('/WithGenre/:genre',
+        .get('/withGenre/:genre',
             AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)));
 }
 // Delete:

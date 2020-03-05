@@ -41,4 +41,6 @@ export class DeleteController {
 
         res.status(200).send(result).end('ok');
     }
+
+
 }

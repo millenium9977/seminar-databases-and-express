@@ -150,13 +150,22 @@ export class MovieManager {
 
     public async DeleteWithLang(lang: string) {
         const repository: Repository<Movie> = getRepository(Movie);
-        const movies: Movie[] = await this.FilterWithLang(lang);
+        const movies: Movie[]               = await this.FilterWithLang(lang);
         return await repository.remove(movies);
     }
 
     public async DeleteWithGenre(genre: string) {
         const repository: Repository<Movie> = getRepository(Movie);
-        const movies = await this.FilterWithGenre(genre);
+        const movies                        = await this.FilterWithGenre(genre);
         return await repository.remove(movies);
+    }
+
+    public async FindAndUpdate(char: string, word: string) {
+        const repository: Repository<Movie> = getRepository(Movie);
+        const movies: Movie[]               = await this.FilterWithWord(word);
+        for (const movie of movies) {
+            const title = movie.Title.replace(new RegExp(word, 'g'), char);
+            await repository.update(movie.Id, {Title: title});
+        }
     }
 }
