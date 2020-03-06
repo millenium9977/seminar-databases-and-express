@@ -1,7 +1,6 @@
 import {singleton} from 'tsyringe';
 import {Company} from '../cross-cutting/data_classes/company';
 import ogmneo from "ogmneo/index";
-import {Movie} from "../cross-cutting/data_classes/movie";
 import logger from "../common/logger";
 
 @singleton()

@@ -17,13 +17,3 @@ export function SearchRoutes(): express.Router {
         .get('/compLang/:lang',
             AsyncExceptionHandler(controller.AllCompaniesWithMovieLang.bind(controller)));
 }
-
-// Search:
-//      >Alle Filme mit "S" oder so am Anfang
-//      >Alle Filme mit dem Genre "Action" oder so
-//      >Alle Companies von Filmen mit "de" als Sprache
-//
-
-// nach zu Search:
-//      > wir nehmen uns eine Company und laden alle Movies dazu und wollen das Budget aller Filme oder wir machen
-//      das für eine Collection

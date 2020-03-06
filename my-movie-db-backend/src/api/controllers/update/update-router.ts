@@ -8,8 +8,3 @@ export function UpdateRoutes(): express.Router {
     return express.Router().get('/replace/:char/:word',
         AsyncExceptionHandler(controller.Replace.bind(controller)));
 }
-
-// Update:
-//      >Such alle Movies mit einem "a" im Titel und ersetzt es durch ein "o" oder so man könnte auch noch das Adult
-//      Ding toggeln
-//

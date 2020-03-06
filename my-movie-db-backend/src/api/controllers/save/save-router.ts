@@ -9,13 +9,3 @@ export function SaveRoutes(): express.Router {
         .get('/:count',
             AsyncExceptionHandler(controller.Save.bind(controller)));
 }
-
-//
-//     Save:
-//          >Movies ohne Relationen
-//          >Movies mit Relationen
-//          >Geht bei Neo4j nicht
-
-// Delete:
-//      > Wir nehmen die Aufgabe von Search und Löschen diese dann
-//

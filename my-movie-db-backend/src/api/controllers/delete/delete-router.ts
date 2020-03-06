@@ -12,18 +12,7 @@ export function DeleteRoutes(): express.Router {
         .get('/withLang/:lang',
             AsyncExceptionHandler(controller.AllMoviesWithLang.bind(controller)))
         .get('/withGenre/:genre',
-            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)));
+            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)))
+        .get('/CompaniesWithLanguage/:lang',
+            AsyncExceptionHandler(controller.AllCompaniesByMovieByLanguage.bind(controller)));
 }
-
-// Delete:
-//      > Wir nehmen die Aufgabe von Search und Löschen diese dann
-
-// Search:
-//      >Alle Filme mit "S" oder so am Anfang
-//      >Alle Filme mit dem Genre "Action" oder so
-//      >Alle Companies von Filmen mit "de" als Sprache
-//
-
-// nach zu Search:
-//      > wir nehmen uns eine Company und laden alle Movies dazu und wollen das Budget aller Filme oder wir machen
-//      das für eine Collection

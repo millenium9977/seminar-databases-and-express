@@ -108,10 +108,7 @@ export class MovieManager {
                 new ogmneo.Where('title', { $contains: char })
             );
         let movies: Array<Movie> = await ogmneo.Node.find(query);
-        if(movies.length == 0) return null;
-        /*for(let movie of movies) {
-            logger.debug(movie);
-        }*/
+        if(movies.length == 0) return null; // prevents executing at length zero, when no movie is found
         let i: number = 0;
         return ogmneo.Node.updateMany(query, { title: movies[i++].title.replace(char, replacement)});
     }
