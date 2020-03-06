@@ -49,6 +49,6 @@ export class DeleteController {
 
         await this.repositoryService.ResetDatabaseWithRelations(100);
         const result: TestResult = await measurementHandler(async () => await this.companyManager.DeleteByMovieLang(lang));
-        res.status(200).send().end('ok');
+        res.status(200).send(result).end('ok');
     }
 }
