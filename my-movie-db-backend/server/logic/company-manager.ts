@@ -1,7 +1,8 @@
-import {singleton} from 'tsyringe';
-import Company, {ICompany} from '../data/schemas/company-schema';
-import mongoose from 'mongoose';
-import logger from '../common/logger';
+import {singleton}             from 'tsyringe';
+import Company, {ICompany}     from '../data/schemas/company-schema';
+import mongoose                from 'mongoose';
+import logger                  from '../common/logger';
+import Movie, {IMovieMetadata} from '../data/schemas/movie-metadata-schema';
 
 @singleton()
 export class CompanyManager {
@@ -39,7 +40,7 @@ export class CompanyManager {
         const session = await mongoose.startSession();
         session.startTransaction();
         try {
-            const opts = {session, new: true};
+            const opts            = {session, new: true};
             let company: ICompany = await Company.findOne({Name: name}, opts);
             if (!company) {
                 company = new Company({
@@ -57,5 +58,25 @@ export class CompanyManager {
             session.endSession();
             throw err;
         }
+    }
+
+    public async FilterByMovieLang(lang: string): Promise<ICompany[]> {
+        const movies: IMovieMetadata[] = await Movie.find({'Spoken_Languages.Name': lang});
+        const companies: ICompany[]    = [];
+        movies.forEach((m) => companies.concat(m.ProductionCompanies));
+        return companies;
+    }
+
+
+    public async DeleteWithLang(lang: string): Promise<ICompany[]> {
+        const companies: ICompany[] = await this.FilterByMovieLang(lang);
+        for (const company of companies) {
+            await company.remove();
+        }
+        return companies;
+    }
+
+    public async Companies(): Promise<any> {
+        return await Company.find();
     }
 }

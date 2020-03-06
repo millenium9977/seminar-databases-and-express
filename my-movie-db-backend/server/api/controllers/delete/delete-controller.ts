@@ -1,64 +1,54 @@
 import {injectable}                     from 'tsyringe';
 import {MovieMdManager}                 from '../../../logic/movieMd-manager';
-import {Request, Response}              from 'express';
 import {DatabaseService}                from '../../../data/database/database-service';
+import {Request, Response}              from 'express';
 import {measurementHandler, TestResult} from '../../../logic/time-measurement-service';
 import {CompanyManager}                 from '../../../logic/company-manager';
 
 @injectable()
-export class SearchController {
+export class DeleteController {
 
-    constructor(private movieMdManager: MovieMdManager,
+    constructor(private movieManager: MovieMdManager,
         private databaseService: DatabaseService,
-        private companyManger: CompanyManager) {
+        private companyManager: CompanyManager) {
     }
 
-    public async AllMovies(req: Request, res: Response) {
+    public async Movies(req: Request, res: Response) {
         const word: string = req.params.word;
 
         await this.databaseService.ResetNoRelations();
-
         const result: TestResult = await measurementHandler(async () =>
-            await this.movieMdManager.FilterWithWord(word));
+            this.movieManager.DeleteWithWord(word));
 
-        res.status(200)
-            .send(result)
-            .end('ok');
+        res.status(200).send(result).end('ok');
     }
 
-    public async MoviesWithLang(req: Request, res: Response) {
+    public async MoviesByLang(req: Request, res: Response) {
         const lang: string = req.params.lang;
 
         await this.databaseService.ResetWithRelations();
-
         const result: TestResult = await measurementHandler(async () =>
-            await this.movieMdManager.FilterWithLang(lang));
+            this.movieManager.DeleteWithLang(lang));
 
-        res.status(200)
-            .send(result)
-            .end('ok');
+        res.status(200).send(result).end('ok');
     }
 
-    public async MovesWithGenre(req: Request, res: Response) {
+    public async MoviesByGenre(req: Request, res: Response) {
         const genre: string = req.params.genre;
 
         await this.databaseService.ResetWithRelations();
-
         const result: TestResult = await measurementHandler(async () =>
-            await this.movieMdManager.FilterWithGenre(genre));
+            this.movieManager.DeleteWithGenre(genre));
 
-        res.status(200)
-            .send(result)
-            .end('ok');
+        res.status(200).send(result).end('ok');
     }
 
     public async CompaniesByLang(req: Request, res: Response) {
         const lang: string = req.params.lang;
 
         await this.databaseService.ResetWithRelations();
-
-        const result: TestResult = await measurementHandler(async () =>
-            await this.companyManger.FilterByMovieLang(lang));
+        const  result: TestResult = await measurementHandler(async () =>
+            await this.companyManager.DeleteWithLang(lang));
 
         res.status(200).send(result).end('ok');
     }

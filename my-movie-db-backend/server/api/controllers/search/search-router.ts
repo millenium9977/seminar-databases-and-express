@@ -1,6 +1,6 @@
-import {Router} from 'express';
-import {SearchController} from './search-controller';
-import {container} from 'tsyringe';
+import {Router}                from 'express';
+import {SearchController}      from './search-controller';
+import {container}             from 'tsyringe';
 import {AsyncExceptionHandler} from '../../../Utils/async-exception-handler';
 
 export function SearchRoutes(): Router {
@@ -11,5 +11,7 @@ export function SearchRoutes(): Router {
         .get('/withLang/:lang',
             AsyncExceptionHandler(controller.MoviesWithLang.bind(controller)))
         .get('/withGenre/:genre',
-            AsyncExceptionHandler(controller.MovesWithGenre.bind(controller)));
+            AsyncExceptionHandler(controller.MovesWithGenre.bind(controller)))
+        .get('/companyLang/:lang',
+            AsyncExceptionHandler(controller.CompaniesByLang.bind(controller)));
 }

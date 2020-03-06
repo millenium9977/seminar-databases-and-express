@@ -17,7 +17,7 @@ export interface IMovieMetadata extends Document {
     OriginalTitle: string;
     Overview: string;
     Popularity: number;
-    ProductionCompanies: ICompany['_id'][];
+    ProductionCompanies: ICompany[];
     ProductionCountries: ICountry[];
     ReleaseDate: string;
     Revenue: number;
