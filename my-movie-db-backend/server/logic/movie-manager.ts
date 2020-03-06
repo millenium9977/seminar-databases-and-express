@@ -168,4 +168,8 @@ export class MovieManager {
             await repository.update(movie.Id, {Title: title});
         }
     }
+
+    public async Movies(): Promise<Movie[]> {
+        return getRepository(Movie).find();
+    }
 }

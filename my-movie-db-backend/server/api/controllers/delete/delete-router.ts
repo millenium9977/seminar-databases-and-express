@@ -11,7 +11,9 @@ export function DeleteRoutes(): express.Router {
         .get('/withLang/:lang',
             AsyncExceptionHandler(controller.AllMoviesWithLang.bind(controller)))
         .get('/withGenre/:genre',
-            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)));
+            AsyncExceptionHandler(controller.AllMoviesWithGenre.bind(controller)))
+        .get('/companyByLang/:lang',
+            AsyncExceptionHandler(controller.CompaniesByLang.bind(controller)));
 }
 // Delete:
 //      > Wir nehmen die Aufgabe von Search und Löschen diese dann

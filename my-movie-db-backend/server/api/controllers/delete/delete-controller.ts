@@ -1,23 +1,25 @@
 import {injectable}                     from 'tsyringe';
-import {Request, Response}                        from 'express';
+import {Request, Response}              from 'express';
 import {measurementHandler, TestResult} from '../../../logic/time-measurement-service';
 import {MovieManager}                   from '../../../logic/movie-manager';
 import {RepositoryService}              from '../../../data/database/repository-service';
+import {CompanyManager}                 from '../../../logic/company-manager';
 
 @injectable()
 export class DeleteController {
 
-    constructor(private _movieManager: MovieManager,
-        private _repositoryService: RepositoryService) {
+    constructor(private movieManager: MovieManager,
+        private repositoryService: RepositoryService,
+        private companyManager: CompanyManager) {
     }
 
     public async AllMoviesWith(req: Request, res: Response) {
         const word: string = req.params.word;
         let result: TestResult;
 
-        await this._repositoryService.ResetDatabaseWithoutRelations(100);
+        await this.repositoryService.ResetDatabaseWithoutRelations(100);
         result = await measurementHandler(async () =>
-            await this._movieManager.DeleteWithWord(word));
+            await this.movieManager.DeleteWithWord(word));
 
         res.status(200).send(result).end('ok');
     }
@@ -26,8 +28,8 @@ export class DeleteController {
         const lang: string = req.params.lang;
         let result: TestResult;
 
-        await this._repositoryService.ResetDatabaseWithRelations(100);
-        result = await measurementHandler(async () => await this._movieManager.DeleteWithLang(lang));
+        await this.repositoryService.ResetDatabaseWithRelations(100);
+        result = await measurementHandler(async () => await this.movieManager.DeleteWithLang(lang));
 
         res.status(200).send(result).end('ok');
     }
@@ -36,11 +38,17 @@ export class DeleteController {
         const genre: string = req.params.genre;
         let result: TestResult;
 
-        await this._repositoryService.ResetDatabaseWithRelations(100);
-        result = await measurementHandler(async () => await this._movieManager.DeleteWithGenre(genre));
+        await this.repositoryService.ResetDatabaseWithRelations(100);
+        result = await measurementHandler(async () => await this.movieManager.DeleteWithGenre(genre));
 
         res.status(200).send(result).end('ok');
     }
 
+    public async CompaniesByLang(req: Request, res: Response) {
+        const lang: string = req.params.lang;
 
+        await this.repositoryService.ResetDatabaseWithRelations(100);
+        const result: TestResult = await measurementHandler(async () => await this.companyManager.DeleteByMovieLang(lang));
+        res.status(200).send().end('ok');
+    }
 }

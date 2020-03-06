@@ -1,4 +1,4 @@
-import {singleton}                 from 'tsyringe';
+import {singleton}                       from 'tsyringe';
 import {Company}                         from '../cross-cutting/data_classes/company';
 import {getRepository, Like, Repository} from 'typeorm';
 
@@ -31,13 +31,17 @@ export class CompanyManager {
 
     public async MoviesBudget(name: string): Promise<number> {
         const repository: Repository<Company> = getRepository(Company);
-        const company: Company = await repository
+        const company: Company                = await repository
             .findOne({where: {Name: Like(`%${name}%`)}, relations: [Company.MoviesProperty]});
 
         let sum = 0;
-        company.Movies.forEach( (m) => sum += m.Budget);
+        company.Movies.forEach((m) => sum += m.Budget);
 
         return sum;
+    }
+
+    public async Companies(): Promise<Company[]> {
+        return getRepository(Company).find();
     }
 
     public async CompaniesByLang(lang: string): Promise<Company[]> {
@@ -48,5 +52,11 @@ export class CompanyManager {
             .leftJoin('movie.Spoken_Languages', 'language')
             .where('language.Name = :lang', {lang: lang})
             .getMany();
+    }
+
+    public async DeleteByMovieLang(lang: string) {
+        const repository: Repository<Company> = getRepository(Company);
+        const companies                       = await this.CompaniesByLang(lang);
+        return repository.remove(companies);
     }
 }
