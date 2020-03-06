@@ -1,22 +1,54 @@
-import {injectable} from 'tsyringe';
-import logger from '../common/logger';
-import {performance} from "perf_hooks";
+import {container, injectable} from 'tsyringe';
+import {performance}           from 'perf_hooks';
 
 @injectable()
 export class TimeMeasurementService {
 
-    private start: number;
-    private end: number;
+    private _start: number;
+    private _end: number;
+    public Result: number;
 
-    public Start() {
-        this.start = performance.now();
-        // console.time('Time needed for insertion: ');
+    /**
+     * Starts the time measurement
+     * @constructor
+     */
+    public Start(): number {
+        this._start = performance.now();
+        return this._start;
     }
 
-    public Stop() {
-        this.end = performance.now();
-        // console.timeEnd('Time needed for insertion: ');
-        logger.debug('Time needed for insertion: ' + (this.end - this.start)/1000.0 + ' seconds');
+    /**
+     * Stops the time measurement and calculates the time in ms
+     * @constructor
+     */
+    public Stop(): number {
+        this._end = performance.now();
+        this.Result = this._end - this._start;
+        return this._end;
     }
 
+    /**
+     * Maybe we can save this to a database but no idea
+     * @constructor
+     */
+    public SaveTime() {
+
+    }
+}
+
+export class TestResult {
+    public Time: string;
+    public Result: any;
+}
+
+export async function measurementHandler(action: () => Promise<any>): Promise<TestResult> {
+    const measurementService: TimeMeasurementService = container.resolve(TimeMeasurementService);
+    measurementService.Start();
+    const result = await action();
+    measurementService.Stop();
+
+    return {
+        Time: `${measurementService.Result / 1000}s`,
+        Result: result,
+    };
 }

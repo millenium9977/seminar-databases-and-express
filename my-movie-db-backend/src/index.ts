@@ -8,10 +8,11 @@ import logger from './common/logger';
 const port = parseInt(process.env.PORT);
 const server = new Server();
 const initPromise = server.Setup();
-initPromise.then(server =>
-    server.router(routes)
-        .listen(port)
-);
+const timeout = parseInt(process.env.TIMEOUT);
+initPromise.then(server => {
+    server.router(routes).listen(port);
+    server.configure(timeout);
+});
 initPromise.catch(err =>
     logger.error(err)
 );

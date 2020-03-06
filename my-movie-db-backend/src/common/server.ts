@@ -2,7 +2,7 @@ import express from 'express';
 import {Application} from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
-import http from 'http';
+import http, {Server} from 'http';
 import os from 'os';
 import installValidator from './openapi';
 import 'reflect-metadata';
@@ -17,6 +17,7 @@ export default class ExpressServer {
 
     private readonly _csvLoaderManager: CsvLoaderManager;
     private readonly _repositoryService: RepositoryService;
+    private server: Server = null;
 
     constructor() {
         const root = path.normalize(__dirname + '/../..');
@@ -34,7 +35,7 @@ export default class ExpressServer {
         if(!connectionStatus) {
             throw new Error('Wasn\'t able to establish a connection to the database');
         }
-        await this._csvLoaderManager.LoadCSV();
+        // await this._csvLoaderManager.LoadCSV();
         return this;
     }
 
@@ -45,8 +46,13 @@ export default class ExpressServer {
 
     listen(p: string | number = process.env.PORT): Application {
         const welcome = port => () => logger.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname()} on port: ${port}}`);
-        http.createServer(app).listen(p, welcome(p));
+        this.server = http.createServer(app).listen(p, welcome(p));
         return app;
+    }
+
+    public configure(timeout: number) {
+        this.server.timeout = timeout;
+        logger.debug(`Timeout is set to ${timeout}ms`);
     }
 
 }

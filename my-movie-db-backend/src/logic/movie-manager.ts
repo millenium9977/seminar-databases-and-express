@@ -6,6 +6,7 @@ import {Country} from '../cross-cutting/data_classes/country';
 import {Language} from '../cross-cutting/data_classes/language';
 import {Company} from '../cross-cutting/data_classes/company';
 import ogmneo from "ogmneo/index";
+import logger from "../common/logger";
 
 @singleton()
 export class MovieManager {
@@ -55,6 +56,66 @@ export class MovieManager {
         return movie;
     }
 
+    public async GetMoviesByStartValue(value: string): Promise<Array<Movie>> {
+        let query = ogmneo.Query
+            .create('movie').where(
+                new ogmneo.Where('title', { $startsWith: value })
+            );
+        return ogmneo.Node.find(query);
+    }
+
+    public async DeleteMoviesByStartValue(value: string) {
+        let query = ogmneo.Query
+            .create('movie').where(
+                new ogmneo.Where('title', { $startsWith: value })
+            );
+        ogmneo.Node.deleteCascade(query).catch( err => {
+            logger.error(err);
+        });
+    }
+
+    public async GetMoviesByGenreByName(name: string): Promise<Array<Movie>> {
+        let query = ogmneo.RelationQuery.create('mov_gen')
+            .endNodeWhere(
+                new ogmneo.Where('name', { $eq: name })
+            );
+        return (await ogmneo.Relation.findNodes(query, 'start') as Array<any>).map(node => node.start);
+    }
+
+    public async GetMoviesByLanguageByName(name: string): Promise<Array<Movie>> {
+        let query = ogmneo.RelationQuery.create('mov_lan')
+            .endNodeWhere(
+                new ogmneo.Where('name', { $eq: name })
+            );
+        return (await ogmneo.Relation.findNodes(query, 'start') as Array<any>).map(node => node.start);
+    }
+
+    public async DeleteMoviesByLanguageByNameCypher(name: string) {
+        ogmneo.Cypher.transactionalRead('MATCH (n1:movie)-[r:mov_lan]->(n2:language) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
+            logger.error(err)
+        );
+    }
+
+    public async DeleteMoviesByGenreByNameCypher(name: string) {
+        ogmneo.Cypher.transactionalRead('MATCH (n1:movie)-[r:mov_gen]->(n2:genre) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
+            logger.error(err)
+        );
+    }
+
+    public async ReplaceCharInMovieTitle(char: string, replacement: string): Promise<Array<Movie>> {
+        let query = ogmneo.Query
+            .create('movie').where(
+                new ogmneo.Where('title', { $contains: char })
+            );
+        let movies: Array<Movie> = await ogmneo.Node.find(query);
+        if(movies.length == 0) return null;
+        /*for(let movie of movies) {
+            logger.debug(movie);
+        }*/
+        let i: number = 0;
+        return ogmneo.Node.updateMany(query, { title: movies[i++].title.replace(char, replacement)});
+    }
+
     public async GetMovieByTitle(title: string): Promise<Movie> {
         if(title.indexOf('\'') !== -1) {
             title = title.replace(/'/g, '') // database doesnt like ' inside their queries
@@ -64,7 +125,7 @@ export class MovieManager {
             .where(
                 new ogmneo.Where('title', { $eq: title })
             );
-        return await ogmneo.Node.findOne(query);
+        return ogmneo.Node.findOne(query);
     }
 
     private async findRelation(node1, node2, relation): Promise<any> {
