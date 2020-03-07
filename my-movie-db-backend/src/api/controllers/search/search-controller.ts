@@ -13,12 +13,12 @@ export class SearchController {
                 private companyManager: CompanyManager) {
     }
 
-    public async AllMoviesStartWith(req: Request, res: Response) {
+    public async AllMoviesContain(req: Request, res: Response) {
         const word: string = req.params.word;
         let result: TestResult;
         await this.repositoryService.ResetDatabase();
         result = await measurementHandler(async () =>
-            await this._movieManager.GetMoviesByStartValue(word),
+            await this._movieManager.GetMoviesByContainingValue(word),
         );
         res.status(200).send(result).end('ok');
     }
