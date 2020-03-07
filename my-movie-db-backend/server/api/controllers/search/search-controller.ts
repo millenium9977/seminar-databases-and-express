@@ -21,6 +21,8 @@ export class SearchController {
             await this._movieManager.FilterWithWord(word),
         );
 
+        this.repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 

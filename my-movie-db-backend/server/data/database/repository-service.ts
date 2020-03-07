@@ -1,12 +1,14 @@
-import {injectable}                                  from 'tsyringe';
+import {injectable, singleton} from 'tsyringe';
 import TypeOrmConfig                                 from './ormconfig';
 import {Connection, createConnection, getConnection} from 'typeorm';
 import logger                                        from '../../common/logger';
 import {CsvLoaderManager}                            from '../csv-loader/csv-loader-manager';
 import {DEFAULT_ENTRY_SIZE} from '../../index';
 
-@injectable()
+@singleton()
 export class RepositoryService {
+
+    public Dirty: boolean = true;
 
     constructor(private _csvLoaderManager: CsvLoaderManager) {
     }
@@ -44,10 +46,15 @@ export class RepositoryService {
     }
 
     public async ResetDatabaseWithoutRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
+        if(!this.Dirty) {
+            return true;
+        }
+
         try {
             await this.ResetDatabase();
-
             await this._csvLoaderManager.WithoutRelations(count);
+
+            this.Dirty = false;
 
             return true;
         } catch (err) {
@@ -57,9 +64,15 @@ export class RepositoryService {
     }
 
     public async ResetDatabaseWithRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
+        if(!this.Dirty) {
+            return true;
+        }
+
         try {
             await this.ResetDatabase();
             await this._csvLoaderManager.WithRelations(count);
+
+            this.Dirty = false;
 
             return true;
         } catch (err) {

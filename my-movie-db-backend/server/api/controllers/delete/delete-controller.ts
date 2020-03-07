@@ -17,9 +17,11 @@ export class DeleteController {
         const word: string = req.params.word;
         let result: TestResult;
 
-        await this.repositoryService.ResetDatabaseWithoutRelations(100);
+        await this.repositoryService.ResetDatabaseWithoutRelations();
         result = await measurementHandler(async () =>
             await this.movieManager.DeleteWithWord(word));
+
+        this.repositoryService.Dirty = true;
 
         res.status(200).send(result).end('ok');
     }
@@ -28,8 +30,10 @@ export class DeleteController {
         const lang: string = req.params.lang;
         let result: TestResult;
 
-        await this.repositoryService.ResetDatabaseWithRelations(100);
+        await this.repositoryService.ResetDatabaseWithRelations();
         result = await measurementHandler(async () => await this.movieManager.DeleteWithLang(lang));
+
+        this.repositoryService.Dirty = true;
 
         res.status(200).send(result).end('ok');
     }
@@ -38,8 +42,10 @@ export class DeleteController {
         const genre: string = req.params.genre;
         let result: TestResult;
 
-        await this.repositoryService.ResetDatabaseWithRelations(100);
+        await this.repositoryService.ResetDatabaseWithRelations();
         result = await measurementHandler(async () => await this.movieManager.DeleteWithGenre(genre));
+
+        this.repositoryService.Dirty = true;
 
         res.status(200).send(result).end('ok');
     }
@@ -47,8 +53,11 @@ export class DeleteController {
     public async CompaniesByLang(req: Request, res: Response) {
         const lang: string = req.params.lang;
 
-        await this.repositoryService.ResetDatabaseWithRelations(100);
+        await this.repositoryService.ResetDatabaseWithRelations();
         const result: TestResult = await measurementHandler(async () => await this.companyManager.DeleteByMovieLang(lang));
+
+        this.repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 }
