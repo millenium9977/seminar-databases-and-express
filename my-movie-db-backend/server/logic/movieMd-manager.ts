@@ -243,17 +243,18 @@ export class MovieMdManager {
     }
 
     public async Replace(char: string, word: string) {
-        const movies: IMovieMetadata[] = await this.FilterWithWord(word);
-        const regEx                    = new RegExp(word, 'g');
+        const movies: IMovieMetadata[] = await this.FilterWithWord(char);
+        const regEx                    = new RegExp(char, 'g');
         for (const m of movies) {
-            m.Title = m.Title.replace(regEx, char);
+            m.Title = m.Title.replace(regEx, word);
             await m.save();
         }
         return movies;
     }
 
     public async DeleteWithWord(word: string): Promise<any> {
-        return await MovieMetadata.deleteMany({Title: word});
+        const regEx = new RegExp(word, 'g');
+        return await MovieMetadata.deleteMany({Title: regEx});
     }
 
     public async DeleteWithLang(lang: string): Promise<any> {

@@ -39,7 +39,7 @@ export class CsvLoaderManager {
 
     private getRecords(): any[] {
         const filepath: string = `${path.join(__dirname, CsvLoaderManager.RELATIVE_DIRECTORY_PATH)}${CsvLoaderManager.FILENAME}`;
-        logger.debug(`Loading csv from: ${filepath}`);
+        // logger.debug(`Loading csv from: ${filepath}`);
         const content: string = fs.readFileSync(filepath, 'utf8');
         return parse(content, {
             delimiter: ',',

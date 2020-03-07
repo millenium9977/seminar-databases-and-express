@@ -20,6 +20,8 @@ export class DeleteController {
         const result: TestResult = await measurementHandler(async () =>
             this.movieManager.DeleteWithWord(word));
 
+        this.databaseService.Dirty =true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -29,6 +31,8 @@ export class DeleteController {
         await this.databaseService.ResetWithRelations();
         const result: TestResult = await measurementHandler(async () =>
             this.movieManager.DeleteWithLang(lang));
+
+        this.databaseService.Dirty =true;
 
         res.status(200).send(result).end('ok');
     }
@@ -40,6 +44,8 @@ export class DeleteController {
         const result: TestResult = await measurementHandler(async () =>
             this.movieManager.DeleteWithGenre(genre));
 
+        this.databaseService.Dirty =true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -49,6 +55,8 @@ export class DeleteController {
         await this.databaseService.ResetWithRelations();
         const  result: TestResult = await measurementHandler(async () =>
             await this.companyManager.DeleteWithLang(lang));
+
+        this.databaseService.Dirty =true;
 
         res.status(200).send(result).end('ok');
     }

@@ -62,8 +62,12 @@ export class CompanyManager {
 
     public async FilterByMovieLang(lang: string): Promise<ICompany[]> {
         const movies: IMovieMetadata[] = await Movie.find({'Spoken_Languages.Name': lang});
-        const companies: ICompany[]    = [];
-        movies.forEach((m) => companies.concat(m.ProductionCompanies));
+        // logger.debug(movies.length.toString());
+        let companies: ICompany[]    = [];
+        for (const m of movies) {
+            // logger.debug(m.ProductionCountries.length.toString());
+            companies = companies.concat(m.ProductionCompanies);
+        }
         return companies;
     }
 

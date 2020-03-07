@@ -3,7 +3,7 @@ import Server from './common/server';
 import routes from './routes';
 import logger from './common/logger';
 
-//TODO: Have to add a bootstrap for the dependency injection
+export const DEFAULT_SIZE = parseInt(process.env.DEFAULT_ENTRY_SIZE);
 
 const port                = parseInt(process.env.PORT);
 const timeout             = parseInt(process.env.TIMEOUT);

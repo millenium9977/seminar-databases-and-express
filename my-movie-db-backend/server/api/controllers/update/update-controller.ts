@@ -18,6 +18,8 @@ export class UpdateController {
         await this.databaseService.ResetNoRelations();
         const result: TestResult = await measurementHandler(async () => await this.movieMdManager.Replace(char, word));
 
+        this.databaseService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 }

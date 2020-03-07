@@ -17,6 +17,8 @@ export class SaveController {
         await this.databaseService.ResetDB();
         const result: TestResult = await measurementHandler(async () => this.csvLoaderManager.LoadData(count, true));
 
+        this.databaseService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -25,6 +27,8 @@ export class SaveController {
 
         await this.databaseService.ResetDB();
         const result: TestResult = await measurementHandler(async () => this.csvLoaderManager.LoadData(count, false));
+
+        this.databaseService.Dirty = true;
 
         res.status(200).send(result).end('ok');
     }

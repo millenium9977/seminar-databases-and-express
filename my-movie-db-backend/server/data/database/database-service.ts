@@ -1,10 +1,13 @@
-import mongoose, {Connection} from 'mongoose';
-import logger                 from '../../common/logger';
-import {injectable}           from 'tsyringe';
-import {CsvLoaderManager}     from '../csv-loader/csv-loader-manager';
+import mongoose from 'mongoose';
+import logger from '../../common/logger';
+import {singleton} from 'tsyringe';
+import {CsvLoaderManager} from '../csv-loader/csv-loader-manager';
+import {DEFAULT_SIZE} from '../../index';
 
-@injectable()
+@singleton()
 export class DatabaseService {
+
+    public Dirty: boolean = true;
 
     constructor(private csvLoaderManager: CsvLoaderManager) {
     }
@@ -27,13 +30,25 @@ export class DatabaseService {
         await mongoose.connection.useDb('moviedb');
     }
 
-    public async ResetNoRelations(count: number = 100): Promise<void> {
+    public async ResetNoRelations(count: number = DEFAULT_SIZE): Promise<void> {
+        if(!this.Dirty) {
+            return;
+        }
+
         await this.ResetDB();
         await this.csvLoaderManager.LoadData(count, false);
+
+        this.Dirty = false;
     }
 
-    public async ResetWithRelations(count: number = 100): Promise<void> {
+    public async ResetWithRelations(count: number = DEFAULT_SIZE): Promise<void> {
+        if(!this.Dirty) {
+            return;
+        }
+
         await this.ResetDB();
         await this.csvLoaderManager.LoadData(count, true);
+
+        this.Dirty = false;
     }
 }
