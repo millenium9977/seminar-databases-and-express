@@ -64,7 +64,7 @@ export class CompanyManager {
     }
 
     public async DeleteCompanyByMovieByLanguageByCodeCypher(code: string) {
-        ogmneo.Cypher.transactionalRead('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.code = \'' + code + '\' DETACH DELETE n1').catch( err =>
+        ogmneo.Cypher.transactionalWrite('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.code = \'' + code + '\' DETACH DELETE n1').catch( err =>
             logger.error(err)
         );
     }

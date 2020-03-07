@@ -13,12 +13,12 @@ export class DeleteController {
                 private _repositoryService: RepositoryService) {
     }
 
-    public async AllMoviesStartWith(req: Request, res: Response) {
+    public async AllMoviesContain(req: Request, res: Response) {
         const word: string = req.params.word;
         let result: TestResult;
         await this._repositoryService.ResetDatabase();
         result = await measurementHandler(async () =>
-            await this._movieManager.DeleteMoviesByStartValue(word)
+            await this._movieManager.DeleteMoviesByContainingValue(word)
         );
 
         this._repositoryService.Dirty = true;

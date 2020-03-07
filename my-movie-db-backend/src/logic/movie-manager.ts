@@ -56,7 +56,7 @@ export class MovieManager {
         return movie;
     }
 
-    public async GetMoviesByStartValue(value: string): Promise<Array<Movie>> {
+    public async GetMoviesByContainingValue(value: string): Promise<Array<Movie>> {
         let query = ogmneo.Query
             .create('movie').where(
                 new ogmneo.Where('title', { $contains: value })
@@ -64,14 +64,11 @@ export class MovieManager {
         return ogmneo.Node.find(query);
     }
 
-    public async DeleteMoviesByStartValue(value: string) {
-        let query = ogmneo.Query
-            .create('movie').where(
-                new ogmneo.Where('title', { $contains: value })
-            );
-        await ogmneo.Node.deleteCascade(query).catch( err => {
-            logger.error(err);
-        });
+
+    public async DeleteMoviesByContainingValue(value: string) {
+        ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + value + '\' DETACH DELETE n').catch( err =>
+            logger.error(err)
+        );
     }
 
     public async GetMoviesByGenreByName(name: string): Promise<Array<Movie>> {
@@ -91,13 +88,13 @@ export class MovieManager {
     }
 
     public async DeleteMoviesByLanguageByNameCypher(name: string) {
-        ogmneo.Cypher.transactionalRead('MATCH (n1:movie)-[r:mov_lan]->(n2:language) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
+        ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_lan]->(n2:language) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
             logger.error(err)
         );
     }
 
     public async DeleteMoviesByGenreByNameCypher(name: string) {
-        ogmneo.Cypher.transactionalRead('MATCH (n1:movie)-[r:mov_gen]->(n2:genre) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
+        ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_gen]->(n2:genre) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
             logger.error(err)
         );
     }
