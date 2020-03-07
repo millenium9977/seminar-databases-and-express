@@ -19,6 +19,9 @@ export class UpdateController {
         result = await measurementHandler(async () =>
             await this._movieManager.ReplaceCharInMovieTitle(char, word)
         );
+
+        this._repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 }

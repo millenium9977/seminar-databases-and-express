@@ -5,8 +5,8 @@ import {Genre} from '../cross-cutting/data_classes/genre';
 import {Country} from '../cross-cutting/data_classes/country';
 import {Language} from '../cross-cutting/data_classes/language';
 import {Company} from '../cross-cutting/data_classes/company';
-import ogmneo from "ogmneo/index";
-import logger from "../common/logger";
+import ogmneo from 'ogmneo/index';
+import logger from '../common/logger';
 
 @singleton()
 export class MovieManager {
@@ -28,7 +28,7 @@ export class MovieManager {
         voteCount: number = 0
     ): Promise<Movie> {
         if(title.indexOf('\'') !== -1) {
-            title = title.replace(/'/g, '') // database doesnt like ' inside their queries
+            title = title.replace(/'/g, ''); // database doesnt like ' inside their queries
         }
         let movie: Movie;
         try {
@@ -59,7 +59,7 @@ export class MovieManager {
     public async GetMoviesByStartValue(value: string): Promise<Array<Movie>> {
         let query = ogmneo.Query
             .create('movie').where(
-                new ogmneo.Where('title', { $startsWith: value })
+                new ogmneo.Where('title', { $contains: value })
             );
         return ogmneo.Node.find(query);
     }
@@ -67,9 +67,9 @@ export class MovieManager {
     public async DeleteMoviesByStartValue(value: string) {
         let query = ogmneo.Query
             .create('movie').where(
-                new ogmneo.Where('title', { $startsWith: value })
+                new ogmneo.Where('title', { $contains: value })
             );
-        ogmneo.Node.deleteCascade(query).catch( err => {
+        await ogmneo.Node.deleteCascade(query).catch( err => {
             logger.error(err);
         });
     }

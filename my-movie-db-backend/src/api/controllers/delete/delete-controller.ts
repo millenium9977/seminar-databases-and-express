@@ -3,7 +3,7 @@ import {Request, Response} from 'express';
 import {measurementHandler, TestResult} from '../../../logic/time-measurement-service';
 import {MovieManager} from '../../../logic/movie-manager';
 import {RepositoryService} from '../../../data/database/repository-service';
-import {CompanyManager} from "../../../logic/company-manager";
+import {CompanyManager} from '../../../logic/company-manager';
 
 @injectable()
 export class DeleteController {
@@ -20,6 +20,9 @@ export class DeleteController {
         result = await measurementHandler(async () =>
             await this._movieManager.DeleteMoviesByStartValue(word)
         );
+
+        this._repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -30,6 +33,9 @@ export class DeleteController {
         result = await measurementHandler(async () =>
             await this._movieManager.DeleteMoviesByLanguageByNameCypher(lang)
         );
+
+        this._repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -40,6 +46,9 @@ export class DeleteController {
         result = await measurementHandler(async () =>
             await this._movieManager.DeleteMoviesByGenreByNameCypher(genre)
         );
+
+        this._repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 
@@ -50,6 +59,9 @@ export class DeleteController {
         result = await measurementHandler(async () =>
             await this._companyManager.DeleteCompanyByMovieByLanguageByCodeCypher(language)
         );
+
+        this._repositoryService.Dirty = true;
+
         res.status(200).send(result).end('ok');
     }
 

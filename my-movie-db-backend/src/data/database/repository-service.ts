@@ -1,10 +1,13 @@
-import {injectable} from 'tsyringe';
+import {singleton} from 'tsyringe';
 import logger from '../../common/logger';
-import ogmneo from "ogmneo/index.js";
+import ogmneo from 'ogmneo/index.js';
 import {CsvLoaderManager} from '../csv-loader/csv-loader-manager';
+import {DEFAULT_SIZE} from '../../index';
 
-@injectable()
+@singleton()
 export class RepositoryService {
+
+    public Dirty: boolean = true;
 
     constructor(private _csvLoaderManager: CsvLoaderManager) { }
 
@@ -15,7 +18,7 @@ export class RepositoryService {
             ogmneo.Connection.logCypherEnabled = false; // For logging all raw queries
             logger.debug('Connected to database.');
             logger.debug('Dropping Database');
-            await this.ResetDatabase(-1);
+            // await this.ResetDatabase(-1);
             return true;
         } catch (err) {
             logger.error(err);
@@ -23,12 +26,19 @@ export class RepositoryService {
         }
     }
 
-    public async ResetDatabase(count: number = 1000): Promise<boolean> {
+    public async ResetDatabase(count: number = DEFAULT_SIZE): Promise<boolean> {
+        if(!this.Dirty) {
+            return;
+        }
+
         try {
+            logger.debug(count.toString());
             await ogmneo.Cypher.transactionalWrite('MATCH (n) DETACH DELETE (n)');
             if(count > 0) {
                 await this._csvLoaderManager.Init(count);
             }
+
+            this.Dirty = false;
             return true;
         } catch (err) {
             logger.error(err);
