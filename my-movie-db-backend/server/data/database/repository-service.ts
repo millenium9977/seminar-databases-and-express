@@ -3,6 +3,7 @@ import TypeOrmConfig                                 from './ormconfig';
 import {Connection, createConnection, getConnection} from 'typeorm';
 import logger                                        from '../../common/logger';
 import {CsvLoaderManager}                            from '../csv-loader/csv-loader-manager';
+import {DEFAULT_ENTRY_SIZE} from '../../index';
 
 @injectable()
 export class RepositoryService {
@@ -42,7 +43,7 @@ export class RepositoryService {
         }
     }
 
-    public async ResetDatabaseWithoutRelations(count: number = 1000): Promise<Boolean> {
+    public async ResetDatabaseWithoutRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
         try {
             await this.ResetDatabase();
 
@@ -55,7 +56,7 @@ export class RepositoryService {
         }
     }
 
-    public async ResetDatabaseWithRelations(count: number = 1000): Promise<Boolean> {
+    public async ResetDatabaseWithRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
         try {
             await this.ResetDatabase();
             await this._csvLoaderManager.WithRelations(count);

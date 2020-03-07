@@ -16,7 +16,7 @@ export class SearchController {
     public async AllMoviesWith(req: Request, res: Response) {
         const word: string = req.params.word;
         let result: TestResult;
-        await this.repositoryService.ResetDatabaseWithoutRelations(1000);
+        await this.repositoryService.ResetDatabaseWithoutRelations();
         result = await measurementHandler(async () =>
             await this._movieManager.FilterWithWord(word),
         );
@@ -28,7 +28,7 @@ export class SearchController {
         const lang = req.params.lang;
         let result: TestResult;
 
-        await this.repositoryService.ResetDatabaseWithRelations(1000);
+        await this.repositoryService.ResetDatabaseWithRelations();
         result = await measurementHandler(async () =>
             await this._movieManager.FilterWithLang(lang),
         );
@@ -40,7 +40,7 @@ export class SearchController {
         const genre: string = req.params.genre;
         let result: TestResult;
 
-        await this.repositoryService.ResetDatabaseWithRelations(1000);
+        await this.repositoryService.ResetDatabaseWithRelations();
         result = await measurementHandler(async () =>
             await this._movieManager.FilterWithGenre(genre));
 
@@ -60,7 +60,7 @@ export class SearchController {
     public async GetCompanyMoviesBudget(req: Request, res: Response) {
         const name: string = req.params.name;
 
-        await this.repositoryService.ResetDatabaseWithRelations(1000);
+        await this.repositoryService.ResetDatabaseWithRelations();
         const result: TestResult = await measurementHandler(
             async () => await this.companyManager.MoviesBudget(name));
 
