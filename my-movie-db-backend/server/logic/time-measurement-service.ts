@@ -25,6 +25,7 @@ export class TimeMeasurementService {
     public Stop(): number {
         this._end = performance.now();
         this.Result = this._end - this._start;
+        logger.debug(`Execution time: ${this.Result}`);
         return this._end;
     }
 
