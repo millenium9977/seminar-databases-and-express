@@ -36,6 +36,19 @@ export class CsvLoaderManager {
         return records;
     }
 
+    public async InitWithRelationships(count: number) {
+        const records: any[] = this.LoadCSV();
+        const length = count > records.length ? records.length : count;
+        for (let i = 0; i < length; i++) {
+            let r = records[i];
+            try {
+                await this._csvObjectFactory.CreateMovieMDWithRelationships(r);
+            } catch (err) {
+                logger.error(err);
+            }
+        }
+    }
+
     public async Init(count: number) {
         const records: any[] = this.LoadCSV();
         const length = count > records.length ? records.length : count;

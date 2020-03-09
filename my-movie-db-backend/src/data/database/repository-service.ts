@@ -27,7 +27,7 @@ export class RepositoryService {
         try {
             await ogmneo.Cypher.transactionalWrite('MATCH (n) DETACH DELETE (n)');
             if(count > 0) {
-                await this._csvLoaderManager.Init(count);
+                await this._csvLoaderManager.InitWithRelationships(count);
             }
             return true;
         } catch (err) {

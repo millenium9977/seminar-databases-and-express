@@ -11,6 +11,7 @@ import {CountryManager} from '../../logic/country-manager';
 import {LanguageManager} from '../../logic/language-manager';
 import {MovieManager} from '../../logic/movie-manager';
 import logger from '../../common/logger';
+import {Movie} from "../../cross-cutting/data_classes/movie";
 
 @injectable()
 export class CsvObjectFactory {
@@ -52,13 +53,22 @@ export class CsvObjectFactory {
      * @param data List with the data to create the MovieMetadata
      * @constructor
      */
-    public async CreateMovieMD(data: any[]): Promise<void> {
+    public async CreateMovieMDWithRelationships(data: any[]): Promise<void> {
         const collection: Collection = await this.createCollections(data[1]);
         const genres: Genre[] = await this.createGenres(data[3]);
         const countries: Country[]   = await this.createCountries(data[13]);
         const companies: Company[]   = await this.createCompanies(data[12]);
         const languages: Language[]  = await this.createLanguages(data[17]);
-        const movie = await this._movieManager.GetOrSaveMovie(
+        const movie = await this.CreateMovieMD(data);
+        await this._movieManager.SetLanguages(movie, languages);
+        await this._movieManager.SetGenres(movie, genres);
+        await this._movieManager.SetCountries(movie, countries);
+        await this._movieManager.SetCollection(movie, collection);
+        await this._movieManager.SetCompanies(movie, companies);
+    }
+
+    public async CreateMovieMD(data: any[]): Promise<Movie> {
+        return this._movieManager.GetOrSaveMovie(
             data[0],
             data[22] | 0,
             data[2] | 0,
@@ -74,11 +84,6 @@ export class CsvObjectFactory {
             data[21],
             data[23],
         );
-        await this._movieManager.SetLanguages(movie, languages);
-        await this._movieManager.SetGenres(movie, genres);
-        await this._movieManager.SetCountries(movie, countries);
-        await this._movieManager.SetCollection(movie, collection);
-        await this._movieManager.SetCompanies(movie, companies);
     }
 
     /**

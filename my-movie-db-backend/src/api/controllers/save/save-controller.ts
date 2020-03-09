@@ -12,6 +12,26 @@ export class SaveController {
                 private _csvLoaderManager: CsvLoaderManager) {
     }
 
+    public async SaveWithRelationships(req: Request, res: Response) {
+        let count: number;
+        try {
+            count = Number.parseInt(req.params.count);
+        } catch (err) {
+            logger.error(err);
+            res.status(500).send().end('error');
+            return;
+        }
+        if (!count || count == 0) {
+            res.status(400).send().end('error');
+            return;
+        }
+        await this._repositoryService.ResetDatabase(-1);
+        const result: TestResult  = await measurementHandler(async () => {
+            await this._csvLoaderManager.InitWithRelationships(count);
+        });
+        res.status(200).send(result).end('ok');
+    }
+
     public async Save(req: Request, res: Response) {
         let count: number;
         try {
@@ -31,4 +51,5 @@ export class SaveController {
         });
         res.status(200).send(result).end('ok');
     }
+
 }

@@ -7,5 +7,7 @@ export function SaveRoutes(): express.Router {
     const controller: SaveController = container.resolve(SaveController);
     return express.Router()
         .get('/:count',
+            AsyncExceptionHandler(controller.SaveWithRelationships.bind(controller)))
+        .get('/withoutRelations/:count',
             AsyncExceptionHandler(controller.Save.bind(controller)));
 }
