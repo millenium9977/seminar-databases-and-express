@@ -1,5 +1,6 @@
 import {container, injectable} from 'tsyringe';
 import {performance}           from 'perf_hooks';
+import logger from '../common/logger';
 
 @injectable()
 export class TimeMeasurementService {
@@ -24,6 +25,7 @@ export class TimeMeasurementService {
     public Stop(): number {
         this._end = performance.now();
         this.Result = this._end - this._start;
+        logger.debug(this.Result.toString());
         return this._end;
     }
 
