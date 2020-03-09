@@ -5,8 +5,8 @@ import {Genre} from '../cross-cutting/data_classes/genre';
 import {Country} from '../cross-cutting/data_classes/country';
 import {Language} from '../cross-cutting/data_classes/language';
 import {Company} from '../cross-cutting/data_classes/company';
-import ogmneo from "ogmneo/index";
-import logger from "../common/logger";
+import ogmneo from 'ogmneo/index';
+import logger from '../common/logger';
 
 @singleton()
 export class MovieManager {
@@ -28,7 +28,7 @@ export class MovieManager {
         voteCount: number = 0
     ): Promise<Movie> {
         if(title.indexOf('\'') !== -1) {
-            title = title.replace(/'/g, '') // database doesnt like ' inside their queries
+            title = title.replace(/'/g, ''); // database doesnt like ' inside their queries
         }
         let movie: Movie;
         try {
@@ -63,6 +63,7 @@ export class MovieManager {
             );
         return ogmneo.Node.find(query);
     }
+
 
     public async DeleteMoviesByContainingValue(value: string) {
         ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + value + '\' DETACH DELETE n').catch( err =>
