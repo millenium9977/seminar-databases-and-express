@@ -15,6 +15,7 @@ const timeout = parseInt(process.env.TIMEOUT);
 logger.debug(`${port}`);
 logger.debug(process.env.MARIA_USER);
 logger.debug(process.env.MARIA_PASSWORD);
+logger.debug(process.env.MARIA_PORT);
 
 initPromise.then(
     (server) => {
