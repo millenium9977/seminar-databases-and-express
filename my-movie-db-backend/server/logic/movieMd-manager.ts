@@ -1,38 +1,38 @@
-import {injectable} from 'tsyringe';
+import {injectable}                    from 'tsyringe';
 import MovieMetadata, {IMovieMetadata} from '../data/schemas/movie-metadata-schema';
-import {IGenre} from '../data/schemas/genre-schema';
-import {ICollection} from '../data/schemas/collection-schema';
-import {ICompany} from '../data/schemas/company-schema';
-import {ICountry} from '../data/schemas/country-schema';
-import {ILanguage} from '../data/schemas/language-schema';
-import mongoose from 'mongoose';
-import logger from '../common/logger';
+import {IGenre}                        from '../data/schemas/genre-schema';
+import {ICollection}                   from '../data/schemas/collection-schema';
+import {ICompany}                      from '../data/schemas/company-schema';
+import {ICountry}                      from '../data/schemas/country-schema';
+import {ILanguage}                     from '../data/schemas/language-schema';
+import mongoose                        from 'mongoose';
+import logger                          from '../common/logger';
 
 @injectable()
 export class MovieMdManager {
 
     public async CreateMovieMetadata(
-        adult: boolean = false,
-        averageVote: number = null,
-        budget: number = null,
-        homepage: string = null,
+        adult: boolean           = false,
+        averageVote: number      = null,
+        budget: number           = null,
+        homepage: string         = null,
         originalLanguage: string = null,
-        originalTitle: string = null,
-        overview: string = null,
-        popularity: number = null,
-        releaseDate: string = null,
-        revenue: number = null,
-        runtime: number = null,
-        status: string = null,
-        tagline: string = null,
+        originalTitle: string    = null,
+        overview: string         = null,
+        popularity: number       = null,
+        releaseDate: string      = null,
+        revenue: number          = null,
+        runtime: number          = null,
+        status: string           = null,
+        tagline: string          = null,
         title: string,
-        video: boolean = false,
-        voteCount: number = null,
-        genres: IGenre[] = null,
-        companies: ICompany[] = null,
-        countries: ICountry[] = null,
-        languages: ILanguage[] = null,
-        collection: ICollection = null,
+        video: boolean           = false,
+        voteCount: number        = null,
+        genres: IGenre[]         = null,
+        companies: ICompany[]    = null,
+        countries: ICountry[]    = null,
+        languages: ILanguage[]   = null,
+        collection: ICollection  = null,
     ): Promise<IMovieMetadata> {
         try {
             let movie: IMovieMetadata = await MovieMetadata.findOne({Title: title});
@@ -62,15 +62,14 @@ export class MovieMdManager {
                 });
 
 
-
                 await movie.save();
 
-                if(collection != null) {
+                if (collection != null) {
                     collection.Movies.push(collection);
                     await collection.save();
                 }
 
-                if(companies != null) {
+                if (companies != null) {
                     for (const company of companies) {
                         company.Movies.push(movie);
                         await company.save();
@@ -228,5 +227,45 @@ export class MovieMdManager {
         }
 
         return movie.save();
+    }
+
+    public async FilterWithWord(word: string): Promise<IMovieMetadata[]> {
+        const regEx = new RegExp(word, 'g');
+        return await MovieMetadata.find({Title: regEx});
+    }
+
+    public async FilterWithLang(lang: string): Promise<IMovieMetadata[]> {
+        return await MovieMetadata.find({'Spoken_Languages.Name': lang});
+    }
+
+    public async FilterWithGenre(genre: string): Promise<IMovieMetadata[]> {
+        return await MovieMetadata.find({'Genres.Name': genre});
+    }
+
+    public async Replace(char: string, word: string) {
+        const movies: IMovieMetadata[] = await this.FilterWithWord(char);
+        const regEx                    = new RegExp(char, 'g');
+        for (const m of movies) {
+            m.Title = m.Title.replace(regEx, word);
+            await m.save();
+        }
+        return movies;
+    }
+
+    public async DeleteWithWord(word: string): Promise<any> {
+        const regEx = new RegExp(word, 'g');
+        return await MovieMetadata.deleteMany({Title: regEx});
+    }
+
+    public async DeleteWithLang(lang: string): Promise<any> {
+        return await MovieMetadata.deleteMany({'Spoken_Languages.Name': lang});
+    }
+
+    public async DeleteWithGenre(genre: string): Promise<any> {
+        return await MovieMetadata.deleteMany({'Genres.Name': genre});
+    }
+
+    public async Movies(): Promise<IMovieMetadata[]> {
+        return await MovieMetadata.find();
     }
 }

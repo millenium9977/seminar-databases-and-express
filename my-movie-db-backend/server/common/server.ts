@@ -2,7 +2,7 @@ import express            from 'express';
 import {Application}      from 'express';
 import path               from 'path';
 import bodyParser         from 'body-parser';
-import http               from 'http';
+import http, {Server}              from 'http';
 import os                 from 'os';
 import cookieParser       from 'cookie-parser';
 import installValidator   from './openapi';
@@ -17,7 +17,7 @@ const app = express();
 export default class ExpressServer {
     private readonly _databaseService: DatabaseService;
     private readonly _csvLoaderManager: CsvLoaderManager;
-
+    private server: Server = null;
     constructor() {
         const root = path.normalize(__dirname + '/../..');
         app.set('appPath', root + 'client');
@@ -29,13 +29,11 @@ export default class ExpressServer {
 
         this._databaseService  = container.resolve(DatabaseService);
         this._csvLoaderManager = container.resolve(CsvLoaderManager);
-
-        this.setup().catch((error) => logger.error(error));
     }
 
-    private async setup(): Promise<void> {
-        await this._databaseService.Setup();
-        await this._csvLoaderManager.LoadCSV();
+    public async Setup(): Promise<boolean> {
+        return await this._databaseService.Setup();
+        // await this._csvLoaderManager.LoadCSV();
     }
 
     public Router(routes: (app: Application) => void): ExpressServer {
@@ -45,7 +43,11 @@ export default class ExpressServer {
 
     public Listen(p: string | number = process.env.PORT): Application {
         const welcome = port => () => logger.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname()} on port: ${port}}`);
-        http.createServer(app).listen(p, welcome(p));
+        this.server = http.createServer(app).listen(p, welcome(p));
         return app;
+    }
+
+    public Configure(timeout: number) : void {
+        this.server.timeout = timeout;
     }
 }
