@@ -15,7 +15,7 @@ export class DatabaseService {
     public async Setup(): Promise<boolean> {
         try {
             logger.debug('Try to connect to database');
-            await mongoose.connect('mongodb://localhost/moviedb', {useNewUrlParser: true, useUnifiedTopology: true});
+            await mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
             this.ResetDB();
             logger.debug('Seem\'s like we got it!');
             return true;
