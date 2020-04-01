@@ -27,6 +27,7 @@ function start() {
         });
     initPromise.catch((err) => {
         logger.error(err);
+        logger.info('Try to connect again');
         setTimeout(start, 1000);
     });
 }
