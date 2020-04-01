@@ -3,7 +3,6 @@ import {Request, Response} from 'express';
 import {MovieMdManager}    from '../../../logic/movieMd-manager';
 import {CompanyManager}                 from '../../../logic/company-manager';
 import {measurementHandler, TestResult} from '../../../logic/time-measurement-service';
-import Test = Mocha.Test;
 
 @injectable()
 export class UtilsController {
@@ -19,6 +18,14 @@ export class UtilsController {
 
     public async Companies(req: Request, res: Response) {
         const result: TestResult = await measurementHandler(async () => this.companyManager.Companies());
+        res.status(200).send(result).end('ok');
+    }
+
+    public async MoviesByWord(req: Request, res: Response): Promise<void> {
+        const word: string = req.params.word;
+
+        const result: TestResult = await measurementHandler(async () => await this.movieManager.FilterWithWord(word));
+
         res.status(200).send(result).end('ok');
     }
 }

@@ -64,4 +64,15 @@ export class SearchController {
 
         res.status(200).send(result).end('ok');
     }
+
+    public async GetCompanyMoviesBudget(req: Request, res: Response) {
+        const name: string = req.params.name;
+
+        await this.databaseService.ResetWithRelations();
+
+        const result: TestResult = await measurementHandler(async () =>
+            await this.companyManger.MoviesBudget(name));
+
+        res.status(200).send(result).end('ok');
+    }
 }

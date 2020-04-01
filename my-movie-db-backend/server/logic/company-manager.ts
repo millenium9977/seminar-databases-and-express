@@ -83,4 +83,12 @@ export class CompanyManager {
     public async Companies(): Promise<any> {
         return await Company.find();
     }
+
+    public async MoviesBudget(name: string): Promise<number> {
+        const movies: IMovieMetadata[] = await Movie.find({'ProductionCompanies.Name': name});
+        let sum = 0;
+        movies.forEach(m => sum += m.Budget);
+        return sum;
+    }
+
 }
