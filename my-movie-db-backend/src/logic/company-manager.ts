@@ -80,4 +80,8 @@ export class CompanyManager {
         return sum;
     }
 
+    public async Companies(): Promise<Array<Company>> {
+        return await ogmneo.Node.find(ogmneo.Query.create('company'));
+    }
+
 }

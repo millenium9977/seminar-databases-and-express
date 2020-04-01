@@ -6,7 +6,7 @@ import {AsyncExceptionHandler} from '../../../Utils/async-exception-handler';
 export function SearchRoutes(): express.Router {
     const controller: SearchController = container.resolve(SearchController);
     return express.Router()
-        .get('/contain/:word',
+        .get('/movies/:word',
             AsyncExceptionHandler(controller.AllMoviesContain.bind(controller)))
         .get('/withLang/:lang',
             AsyncExceptionHandler(controller.AllMoviesWithLang.bind(controller)))

@@ -19,6 +19,7 @@
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "express-openapi-validator": "^2.12.1",
+    "material-components-web": "^5.1.0",
     "mysql2": "^2.1.0",
     "ogmneo": "^1.0.6",
     "pino": "^5.13.4",

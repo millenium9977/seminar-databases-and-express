@@ -122,6 +122,10 @@ export class MovieManager {
         return ogmneo.Node.findOne(query);
     }
 
+    public async Movies(): Promise<Array<Movie>> {
+        return await ogmneo.Node.find(ogmneo.Query.create('movie'));
+    }
+
     private async findRelation(node1, node2, relation): Promise<any> {
         let query = ogmneo.RelationQuery.create(relation)
             .startNode(node1.id)
