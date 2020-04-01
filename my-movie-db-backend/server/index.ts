@@ -18,20 +18,17 @@ logger.debug(process.env.MARIA_PORT);
 
 start();
 
+server.router(routes)
+    .listen(port);
+server.configure(timeout);
+
 function start() {
     const initPromise = server.Setup();
     initPromise.catch((err) => {
         logger.error(err);
         logger.info('Try to connect again');
-        setTimeout(() => {}, parseInt(process.env.RETRY_TIMEOUT) | 5000);
-        start();
+        setTimeout(() => start(), parseInt(process.env.RETRY_TIMEOUT) | 5000);
+
     });
-
-    server.router(routes)
-        .listen(port);
-    server.configure(timeout);
 }
 
-function afterStart() {
-
-}
