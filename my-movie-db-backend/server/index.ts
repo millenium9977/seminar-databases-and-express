@@ -15,6 +15,7 @@ logger.debug(`${port}`);
 logger.debug(process.env.MARIA_USER);
 logger.debug(process.env.MARIA_PASSWORD);
 logger.debug(process.env.MARIA_PORT);
+
 start();
 
 function start() {
@@ -28,7 +29,7 @@ function start() {
     initPromise.catch((err) => {
         logger.error(err);
         logger.info('Try to connect again');
-        setTimeout(start, 1000);
+        setTimeout(start, 5000);
     });
 }
 
