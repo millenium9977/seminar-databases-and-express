@@ -27,8 +27,7 @@ function start() {
         });
     initPromise.catch((err) => {
         logger.error(err);
-        this.sleep(1000);
-        start();
+        setTimeout(start, 1000);
     });
 }
 
