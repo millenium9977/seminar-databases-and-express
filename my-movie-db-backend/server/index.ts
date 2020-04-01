@@ -11,6 +11,11 @@ const port        = parseInt(process.env.PORT);
 const server      = new Server();
 const initPromise = server.Setup();
 const timeout = parseInt(process.env.TIMEOUT);
+
+logger.debug(`${port}`);
+logger.debug(process.env.MARIA_USER);
+logger.debug(process.env.MARIA_PASSWORD);
+
 initPromise.then(
     (server) => {
         server.router(routes)
