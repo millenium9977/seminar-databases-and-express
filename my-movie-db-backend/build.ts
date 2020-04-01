@@ -9,4 +9,4 @@ s.mkdir('-p', `${outDir}/common/swagger`);
 s.cp('server/common/api.yml', `${outDir}/common/api.yml`);
 
 s.mkdir('-p', `${outDir}/dataset`);
-s.cp('server/dataset/movies_metadata.csv', `${outDir}/dataset/moviews_metadata.csv`);
+s.cp('server/dataset/movies_metadata.csv', `${outDir}/dataset/movies_metadata.csv`);
