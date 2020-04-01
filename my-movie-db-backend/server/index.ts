@@ -29,7 +29,8 @@ function start() {
     initPromise.catch((err) => {
         logger.error(err);
         logger.info('Try to connect again');
-        setTimeout(start, 5000);
+        setTimeout(() => {}, parseInt(process.env.RETRY_TIMEOUT) | 5000);
+        start();
     });
 }
 
