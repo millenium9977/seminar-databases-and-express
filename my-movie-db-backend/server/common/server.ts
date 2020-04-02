@@ -13,6 +13,7 @@ import {CsvLoaderManager} from '../data/csv-loader/csv-loader-manager';
 import {DatabaseService}  from '../data/database/database-service';
 
 const app = express();
+const cors = require('cors');
 
 export default class ExpressServer {
     private readonly _databaseService: DatabaseService;
@@ -26,6 +27,7 @@ export default class ExpressServer {
         app.use(bodyParser.text({limit: process.env.REQUEST_LIMIT || '100kb'}));
         // app.use(cookieParser(process.env.SESSION_SECRET));
         app.use(express.static(`${root}/public`));
+        app.use(cors());
 
         this._databaseService  = container.resolve(DatabaseService);
         this._csvLoaderManager = container.resolve(CsvLoaderManager);
