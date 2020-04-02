@@ -14,7 +14,8 @@ export class RepositoryService {
     public async InitDatabase(): Promise<boolean> {
         try {
             logger.debug('Try to connect to the database.');
-            await ogmneo.Connection.connect(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD, process.env.NEO4J_HOST);
+            ogmneo.Connection.connect(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD, process.env.NEO4J_HOST);
+            logger.info(ogmneo.Connection.isConnected);
             ogmneo.Connection.logCypherEnabled = false; // For logging all raw queries
             logger.debug('Connected to database.');
             logger.debug('Dropping Database');
