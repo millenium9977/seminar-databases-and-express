@@ -2,9 +2,9 @@ import express             from 'express';
 import {Application}       from 'express';
 import path                from 'path';
 import bodyParser          from 'body-parser';
-import timeout        from 'connect-timeout';
-import http, {Server} from 'http';
-import os             from 'os';
+import timeout             from 'connect-timeout';
+import http, {Server}      from 'http';
+import os                  from 'os';
 import cookieParser        from 'cookie-parser';
 import installValidator    from './openapi';
 import 'reflect-metadata';
@@ -13,7 +13,8 @@ import {container}         from 'tsyringe';
 import {CsvLoaderManager}  from '../data/csv-loader/csv-loader-manager';
 import {RepositoryService} from '../data/database/repository-service';
 
-const app = express();
+const app  = express();
+const cors = require('cors');
 
 export default class ExpressServer {
     private readonly _csvLoaderManager: CsvLoaderManager;
@@ -29,6 +30,7 @@ export default class ExpressServer {
         app.use(bodyParser.urlencoded({extended: true, limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(bodyParser.text({limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(express.static(`${root}/public`));
+        app.use(cors());
 
         this._csvLoaderManager  = container.resolve(CsvLoaderManager);
         this._repositoryService = container.resolve(RepositoryService);
@@ -51,7 +53,7 @@ export default class ExpressServer {
 
     public listen(p: string | number = process.env.PORT): Application {
         const welcome = port => () => logger.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname()} on port: ${port}}`);
-        this.server = http.createServer(app).listen(p, welcome(p));
+        this.server   = http.createServer(app).listen(p, welcome(p));
         return app;
     }
 
