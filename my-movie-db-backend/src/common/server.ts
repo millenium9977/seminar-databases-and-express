@@ -12,6 +12,7 @@ import {CsvLoaderManager} from '../data/csv-loader/csv-loader-manager';
 import {RepositoryService} from '../data/database/repository-service';
 
 const app = express();
+const cors = require('cors');
 
 export default class ExpressServer {
 
@@ -21,11 +22,14 @@ export default class ExpressServer {
 
     constructor() {
         const root = path.normalize(__dirname + '/../..');
+
         app.set('appPath', root + 'client');
         app.use(bodyParser.json({limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(bodyParser.urlencoded({extended: true, limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(bodyParser.text({limit: process.env.REQUEST_LIMIT || '100kb'}));
         app.use(express.static(`${root}/public`));
+        app.use(cors());
+
         this._csvLoaderManager   = container.resolve(CsvLoaderManager);
         this._repositoryService = container.resolve(RepositoryService);
     }
