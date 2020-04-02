@@ -99,7 +99,7 @@ export class MovieManager {
         );
     }
 
-    public async ReplaceCharInMovieTitle(char: string, replacement: string): Promise<Array<Movie>> {
+    public async ReplaceCharInMovieTitle(replacement: string, char: string): Promise<Array<Movie>> {
         let query = ogmneo.Query
             .create('movie').where(
                 new ogmneo.Where('title', { $contains: char })
