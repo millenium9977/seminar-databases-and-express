@@ -51,6 +51,6 @@ export async function measurementHandler(action: () => Promise<any>): Promise<Te
 
     return {
         Time: `${measurementService.Result / 1000}s`,
-        Result: result,
+        Result: '',
     };
 }
