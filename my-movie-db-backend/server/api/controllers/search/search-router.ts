@@ -14,6 +14,6 @@ export function SearchRoutes(): Router {
             AsyncExceptionHandler(controller.MovesWithGenre.bind(controller)))
         .get('/budget/:name',
             AsyncExceptionHandler(controller.GetCompanyMoviesBudget.bind(controller)))
-        .get('/companyLang/:lang',
+        .get('/compLang/:lang',
             AsyncExceptionHandler(controller.CompaniesByLang.bind(controller)));
 }
