@@ -7,7 +7,7 @@ export const DEFAULT_SIZE = parseInt(process.env.DEFAULT_ENTRY_SIZE);
 
 const port    = parseInt(process.env.PORT);
 const server  = new Server();
-const timeout = parseInt(process.env.TIMEOUT);
+const timeout = 60000000;
 
 logger.debug(process.env.PORT);
 logger.debug(process.env.NEO4J_HOST);
