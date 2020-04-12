@@ -46,15 +46,13 @@ export class RepositoryService {
     }
 
     public async ResetDatabaseWithoutRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
-        if(!this.Dirty) {
+        if(this.Dirty) {
             return true;
         }
 
         try {
             await this.ResetDatabase();
             await this._csvLoaderManager.WithoutRelations(count);
-
-            this.Dirty = false;
 
             return true;
         } catch (err) {
@@ -64,15 +62,13 @@ export class RepositoryService {
     }
 
     public async ResetDatabaseWithRelations(count: number = DEFAULT_ENTRY_SIZE): Promise<Boolean> {
-        if(!this.Dirty) {
+        if(this.Dirty) {
             return true;
         }
 
         try {
             await this.ResetDatabase();
             await this._csvLoaderManager.WithRelations(count);
-
-            this.Dirty = false;
 
             return true;
         } catch (err) {
