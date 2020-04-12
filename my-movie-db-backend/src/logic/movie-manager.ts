@@ -109,7 +109,7 @@ export class MovieManager {
     }
 
     public async ReplaceCharInMovieTitle(replacement: string, char: string): Promise<Array<Movie>> {
-        let records  = (await ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + char + '\' SET n.title = replace(n.title, \'' + char + '\', \'' + replacement + '\') RETURN n'));
+        let records  = (await ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + char + '\' SET n.title = replace(n.title, \'' + char + '\', \'' + replacement + '\') RETURN n')).records;
         return records.map( r => {
             return {
                 adult: r._fields[0].properties.adult,
