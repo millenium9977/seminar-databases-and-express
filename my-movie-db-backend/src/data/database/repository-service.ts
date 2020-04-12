@@ -27,7 +27,7 @@ export class RepositoryService {
     }
 
     public async ResetDatabase(count: number = DEFAULT_SIZE): Promise<boolean> {
-        if(!this.Dirty) {
+        if(this.Dirty && count != -1) {
             return;
         }
 
@@ -38,7 +38,6 @@ export class RepositoryService {
                 await this._csvLoaderManager.InitWithRelationships(count);
             }
 
-            this.Dirty = false;
             return true;
         } catch (err) {
             logger.error(err);
