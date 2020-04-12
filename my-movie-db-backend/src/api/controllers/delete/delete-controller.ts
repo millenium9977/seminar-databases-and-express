@@ -57,7 +57,7 @@ export class DeleteController {
         let result: TestResult;
         await this._repositoryService.ResetDatabase();
         result = await measurementHandler(async () =>
-            await this._companyManager.DeleteCompanyByMovieByLanguageByCodeCypher(language)
+            await this._companyManager.DeleteCompanyByMovieByLanguageByNameCypher(language)
         );
 
         this._repositoryService.Dirty = true;

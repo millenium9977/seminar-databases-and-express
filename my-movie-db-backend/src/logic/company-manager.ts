@@ -51,8 +51,8 @@ export class CompanyManager {
         });
     }
 
-    public async GetCompanyByMovieByLanguageByCodeCypher(code: string): Promise<Array<Company>> {
-        let movies = (await ogmneo.Cypher.transactionalRead('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.code = \'' + code + '\' RETURN n1')).records;
+    public async GetCompanyByMovieByLanguageByNameCypher(name: string): Promise<Array<Company>> {
+        let movies = (await ogmneo.Cypher.transactionalRead('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.name = \'' + name + '\' RETURN n1')).records;
         return movies.map( movie => {
             return {
                 name: movie._fields[0].properties.name,
@@ -63,8 +63,8 @@ export class CompanyManager {
         });
     }
 
-    public async DeleteCompanyByMovieByLanguageByCodeCypher(code: string) {
-        ogmneo.Cypher.transactionalWrite('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.code = \'' + code + '\' DETACH DELETE n1').catch( err =>
+    public async DeleteCompanyByMovieByLanguageByNameCypher(name: string) {
+        ogmneo.Cypher.transactionalWrite('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
             logger.error(err)
         );
     }

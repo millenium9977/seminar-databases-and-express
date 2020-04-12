@@ -47,7 +47,7 @@ export class SearchController {
         const lang: string = req.params.lang;
         await this.repositoryService.ResetDatabase();
         const result: TestResult = await measurementHandler(async () =>
-            await this.companyManager.GetCompanyByMovieByLanguageByCodeCypher(lang)
+            await this.companyManager.GetCompanyByMovieByLanguageByNameCypher(lang)
         );
         res.status(200).send(result).end('ok');
     }
