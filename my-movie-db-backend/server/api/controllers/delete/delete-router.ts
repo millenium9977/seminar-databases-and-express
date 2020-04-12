@@ -8,9 +8,9 @@ export function DeleteRoutes(): Router {
     return Router()
         .get('/movies/:word',
             AsyncExceptionHandler(controller.Movies.bind(controller)))
-        .get('/byLang/:lang',
+        .get('/withLang/:lang',
             AsyncExceptionHandler(controller.MoviesByLang.bind(controller)))
-        .get('/byGenre/:genre',
+        .get('/withGenre/:genre',
             AsyncExceptionHandler(controller.MoviesByGenre.bind(controller)))
         .get('/companyByLang/:lang',
             AsyncExceptionHandler(controller.CompaniesByLang.bind(controller)));

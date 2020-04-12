@@ -16,7 +16,7 @@ export class UpdateController {
         const word:string = req.params.word;
 
         await this.databaseService.ResetNoRelations();
-        const result: TestResult = await measurementHandler(async () => await this.movieMdManager.Replace(char, word));
+        const result: TestResult = await measurementHandler(async () => await this.movieMdManager.Replace(word, char));
 
         this.databaseService.Dirty = true;
 
