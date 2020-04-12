@@ -66,9 +66,12 @@ export class MovieManager {
 
 
     public async DeleteMoviesByContainingValue(value: string) {
-        ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + value + '\' DETACH DELETE n').catch( err =>
-            logger.error(err)
-        );
+        let records = (await ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + value + '\' DETACH DELETE n RETURN n')).records;
+        return records.map( r => {
+            return {
+                id: r._fields[0].identity.low
+            }
+        });
     }
 
     public async GetMoviesByGenreByName(name: string): Promise<Array<Movie>> {
@@ -87,27 +90,44 @@ export class MovieManager {
         return (await ogmneo.Relation.findNodes(query, 'start') as Array<any>).map(node => node.start);
     }
 
-    public async DeleteMoviesByLanguageByNameCypher(name: string) {
-        ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_lan]->(n2:language) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
-            logger.error(err)
-        );
+    public async DeleteMoviesByLanguageByNameCypher(name: string): Promise<Array<any>> {
+        let records = (await ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_lan]->(n2:language) WHERE n2.name = \'' + name + '\' DETACH DELETE n1 RETURN n1')).records;
+        return records.map( r => {
+            return {
+                id: r._fields[0].identity.low
+            }
+        });
     }
 
-    public async DeleteMoviesByGenreByNameCypher(name: string) {
-        ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_gen]->(n2:genre) WHERE n2.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
-            logger.error(err)
-        );
+    public async DeleteMoviesByGenreByNameCypher(name: string): Promise<Array<any>> {
+        let records  = (await ogmneo.Cypher.transactionalWrite('MATCH (n1:movie)-[r:mov_gen]->(n2:genre) WHERE n2.name = \'' + name + '\' DETACH DELETE n1 RETURN n1')).records;
+        return records.map( r => {
+            return {
+                id: r._fields[0].identity.low
+            }
+        });
     }
 
     public async ReplaceCharInMovieTitle(replacement: string, char: string): Promise<Array<Movie>> {
-        let query = ogmneo.Query
-            .create('movie').where(
-                new ogmneo.Where('title', { $contains: char })
-            );
-        let movies: Array<Movie> = await ogmneo.Node.find(query);
-        if(movies.length == 0) return null; // prevents executing at length zero, when no movie is found
-        let i: number = 0;
-        return ogmneo.Node.updateMany(query, { title: movies[i++].title.replace(char, replacement)});
+        let records  = (await ogmneo.Cypher.transactionalWrite('MATCH (n:movie) WHERE n.title CONTAINS \'' + char + '\' SET n.title = replace(n.title, \'' + char + '\', \'' + replacement + '\') RETURN n'));
+        return records.map( r => {
+            return {
+                adult: r._fields[0].properties.adult,
+                budget: r._fields[0].properties.budget,
+                homepage: r._fields[0].properties.hompage,
+                originalLanguage: r._fields[0].properties.originalLanguage,
+                originalTitle: r._fields[0].properties.originalTitle,
+                overview: r._fields[0].properties.overview,
+                popularity: r._fields[0].properties.popularity,
+                releaseDate: r._fields[0].properties.releaseDate,
+                status: r._fields[0].properties.status,
+                tagline: r._fields[0].properties.tagline,
+                title: r._fields[0].properties.title,
+                video: r._fields[0].properties.video,
+                voteCount: r._fields[0].properties.voteCount,
+                id: r._fields[0].identity.low
+            }
+        });
     }
 
     public async GetMovieByTitle(title: string): Promise<Movie> {

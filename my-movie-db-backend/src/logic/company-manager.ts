@@ -64,9 +64,12 @@ export class CompanyManager {
     }
 
     public async DeleteCompanyByMovieByLanguageByNameCypher(name: string) {
-        ogmneo.Cypher.transactionalWrite('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.name = \'' + name + '\' DETACH DELETE n1').catch( err =>
-            logger.error(err)
-        );
+        let records = (await ogmneo.Cypher.transactionalWrite('MATCH (n1:company)-[r:com_mov]->(n2:movie)-[r2:mov_lan]->(n3:language) WHERE n3.name = \'' + name + '\' DETACH DELETE n1 RETURN n1')).records;
+        return records.map( r => {
+            return {
+                id: r._fields[0].identity.low
+            }
+        });
     }
 
     public async GetBudgetByCompanyName(name: string): Promise<number> {
