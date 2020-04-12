@@ -31,24 +31,22 @@ export class DatabaseService {
     }
 
     public async ResetNoRelations(count: number = DEFAULT_SIZE): Promise<void> {
-        if(!this.Dirty) {
+        if(this.Dirty) {
             return;
         }
 
         await this.ResetDB();
         await this.csvLoaderManager.LoadData(count, false);
 
-        this.Dirty = false;
     }
 
     public async ResetWithRelations(count: number = DEFAULT_SIZE): Promise<void> {
-        if(!this.Dirty) {
+        if(this.Dirty) {
             return;
         }
 
         await this.ResetDB();
         await this.csvLoaderManager.LoadData(count, true);
 
-        this.Dirty = false;
     }
 }
