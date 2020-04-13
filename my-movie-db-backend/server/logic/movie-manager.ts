@@ -166,7 +166,10 @@ export class MovieManager {
         for (const movie of movies) {
             const title = movie.Title.replace(new RegExp(word, 'g'), char);
             await repository.update(movie.Id, {Title: title});
+            movie.Title = title;
         }
+
+        return movies;
     }
 
     public async Movies(): Promise<Movie[]> {

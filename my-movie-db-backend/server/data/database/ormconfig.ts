@@ -22,6 +22,7 @@ const config: ConnectionOptions = {
     synchronize: true,
     type: 'mariadb',
     username: process.env.MARIA_USER,
+    charset: 'latin1_general_cs'
 };
 
 export default config;

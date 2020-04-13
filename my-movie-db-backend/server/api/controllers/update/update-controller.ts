@@ -18,6 +18,7 @@ export class UpdateController {
         await this._repositoryService.ResetDatabaseWithoutRelations();
         result = await measurementHandler(async () => await this._movieManager.FindAndUpdate(char, word));
 
+
         this._repositoryService.Dirty = true;
 
         res.status(200).send(result).end('ok');

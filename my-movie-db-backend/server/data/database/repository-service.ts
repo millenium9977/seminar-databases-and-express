@@ -19,7 +19,7 @@ export class RepositoryService {
             const connection: Connection = await createConnection(TypeOrmConfig);
             logger.debug('Connected to database.');
 
-            this.ResetDatabase();
+            await this.ResetDatabase();
             return true;
         } catch (err) {
             logger.error(err);
@@ -30,7 +30,6 @@ export class RepositoryService {
     public async ResetDatabase(): Promise<boolean> {
         try {
             const connection = getConnection();
-
             if(!connection) {
                 return false;
             }
