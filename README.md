@@ -1,1 +1,1 @@
-# seminar-databases-and-express
+# MongoDB - mongoose
